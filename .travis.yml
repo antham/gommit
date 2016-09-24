@@ -9,6 +9,9 @@ before_install:
   - go get github.com/Masterminds/glide
   - go get github.com/alecthomas/gometalinter
   - gometalinter --install --update
+  - wget -O /tmp/libgit2.tar.gz https://github.com/libgit2/libgit2/archive/v0.24.1.tar.gz
+  - cd /tmp/ && tar xf libgit2.tar.gz && cd -
+  - export PKG_CONFIG_PATH=PKG_CONFIG_PATH:/tmp/libgit2
 
 install: glide install
 
