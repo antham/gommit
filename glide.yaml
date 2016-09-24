@@ -1,0 +1,9 @@
+package: github.com/antham/gommit
+import:
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: github.com/Sirupsen/logrus
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert
+- package: github.com/libgit2/git2go
