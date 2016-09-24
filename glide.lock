@@ -1,8 +1,12 @@
-hash: e8701bb2e65e7c0bba9987ac8120ca9ec51ded1975521473e4a92ec1ac857ae9
-updated: 2016-09-24T17:41:41.000542323+02:00
+hash: 6b0b1263f1a71bab95ab09244d860b1d7ede97e69565c6a1272b2e2d9355a0e1
+updated: 2016-09-24T22:35:39.820249229+02:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
+- name: github.com/glenn-brown/golang-pkg-pcre
+  version: 48bb82a8b8ceea98f4e97825b43870f6ba1970d6
+  subpackages:
+  - src/pkg/pcre
 - name: github.com/hashicorp/hcl
   version: ef8133da8cda503718a74741312bf50821e6de79
   subpackages:

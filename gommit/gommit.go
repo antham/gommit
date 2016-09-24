@@ -1,6 +1,9 @@
 package gommit
 
 import (
+	"bytes"
+
+	"github.com/glenn-brown/golang-pkg-pcre/src/pkg/pcre"
 	"github.com/libgit2/git2go"
 )
 
@@ -50,4 +53,15 @@ func FetchCommits(repoPath string, from string, till string) (*[]*git.Commit, er
 
 		commits = append(commits, c)
 	}
+}
+
+// MessageMatchTemplate try to match a commit message against a regexp
+func MessageMatchTemplate(message string, template string) (bool, string) {
+	r := pcre.MustCompile(template, pcre.ANCHORED)
+
+	msgByte := []byte(message)
+
+	g := r.Matcher(msgByte, pcre.ANCHORED).Group(0)
+
+	return bytes.Equal(msgByte, g), string(g)
 }

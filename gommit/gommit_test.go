@@ -36,3 +36,36 @@ func TestFetchCommitsWithWrongInterval(t *testing.T) {
 	_, err := FetchCommits("test", "4906f72818c0185162a3ec9c39a711d7c2842d40", "maste")
 	assert.Error(t, err, "Must return an error")
 }
+
+func TestMessageMatchTemplate1(t *testing.T) {
+	msg := "(feat) : Hello world !"
+	temp := "\\((?:feat|test|bug)\\) : .*"
+
+	match, extractedGroup := MessageMatchTemplate(msg, temp)
+	assert.True(t, match, "Message must match template")
+	assert.Equal(t, msg, extractedGroup, "Must return extracted group")
+}
+
+func TestMessageMatchTemplate2(t *testing.T) {
+	msg := "(feat) : Hello world !\n"
+	msg += "* test1\n"
+	msg += "* test2\n"
+	msg += "* test3\n"
+
+	temp := "\\((?:feat|test|bug)\\) : .*?\n(?:\\* .*?\n)+"
+
+	match, extractedGroup := MessageMatchTemplate(msg, temp)
+	assert.True(t, match, "Message must match template")
+	assert.Equal(t, msg, extractedGroup, "Must return extracted group")
+}
+
+func TestDontMessageMatchTemplate(t *testing.T) {
+	msg := "This is a test\n"
+	msg += "=> an added reason\n"
+
+	temp := "This is a test\n=> an added reaso\n"
+
+	match, extractedGroup := MessageMatchTemplate(msg, temp)
+	assert.False(t, match, "Message must not match template")
+	assert.NotEqual(t, msg, extractedGroup, "Must return extracted group")
+}
