@@ -28,7 +28,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is .gommit.toml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", ".gommit.toml", "")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -37,11 +37,11 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 
-	viper.SetConfigName(".gommit")
-	viper.AddConfigPath("$PWD")
-	viper.AutomaticEnv()
+	viper.AddConfigPath(".")
 
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Println("Can't read config file " + cfgFile)
+		fmt.Println(err)
+		os.Exit(-1)
 	}
 }
