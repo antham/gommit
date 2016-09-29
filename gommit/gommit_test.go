@@ -69,3 +69,26 @@ func TestDontMessageMatchTemplate(t *testing.T) {
 	assert.False(t, match, "Message must not match template")
 	assert.NotEqual(t, msg, extractedGroup, "Must return extracted group")
 }
+
+func TestRunMatching(t *testing.T) {
+	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"})
+
+	assert.NoError(t, err, "Must return no errors")
+	assert.Len(t, *m, 0, "Must return no items, match was successful for every commit")
+}
+
+func TestRunMatchingWithAnErrorCommit(t *testing.T) {
+	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"})
+
+	assert.NoError(t, err, "Must return no errors")
+	assert.Len(t, *m, 1, "Must return one item")
+	assert.Equal(t, (*m)[0]["message"], "feat(file2) : new file 2\n\ncreate a new file 2\n", "Must contains commit message")
+}
+
+func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {
+	m, err := RunMatching("test/", "master", "master~2", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"})
+
+	assert.Error(t, err, "Must return an error")
+	assert.EqualError(t, err, "No commits found between master and master~2", "Must return an explicit message error")
+	assert.Len(t, *m, 0, "Must return no item")
+}

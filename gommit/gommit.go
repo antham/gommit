@@ -2,6 +2,7 @@ package gommit
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/glenn-brown/golang-pkg-pcre/src/pkg/pcre"
 	"github.com/libgit2/git2go"
@@ -64,4 +65,40 @@ func MessageMatchTemplate(message string, template string) (bool, string) {
 	g := r.Matcher(msgByte, pcre.ANCHORED).Group(0)
 
 	return bytes.Equal(msgByte, g), string(g)
+}
+
+// RunMatching trigger regexp matching against a range message commits
+func RunMatching(path string, from string, till string, matchers map[string]string) (*[]map[string]string, error) {
+	analysis := []map[string]string{}
+
+	commits, err := FetchCommits(path, from, till)
+
+	if err != nil {
+		return &analysis, nil
+	}
+
+	if len(*commits) == 0 {
+		return &analysis, fmt.Errorf("No commits found between %s and %s", from, till)
+	}
+
+	for _, commit := range *commits {
+		var ok bool
+
+		for _, matcher := range matchers {
+			t, _ := MessageMatchTemplate(commit.Message(), matcher)
+
+			if t {
+				ok = true
+			}
+		}
+
+		if !ok {
+			analysis = append(analysis, map[string]string{
+				"id":      commit.Id().String(),
+				"message": commit.Message(),
+			})
+		}
+	}
+
+	return &analysis, nil
 }
