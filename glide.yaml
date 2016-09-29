@@ -10,3 +10,5 @@ import:
 - package: github.com/glenn-brown/golang-pkg-pcre
   subpackages:
   - src/pkg/pcre
+- package: github.com/fatih/color
+  version: ^1.0.0

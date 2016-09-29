@@ -1,6 +1,8 @@
-hash: 6b0b1263f1a71bab95ab09244d860b1d7ede97e69565c6a1272b2e2d9355a0e1
-updated: 2016-09-24T22:35:39.820249229+02:00
+hash: 38bc7fa6a73bcd5adededb798ecf5c8bc16be1c38b831ee1c9024d3a9053c748
+updated: 2016-09-29T21:16:50.316251502+02:00
 imports:
+- name: github.com/fatih/color
+  version: 87d4004f2ab62d0d255e0a38f1680aa534549fe3
 - name: github.com/fsnotify/fsnotify
   version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
 - name: github.com/glenn-brown/golang-pkg-pcre
@@ -26,6 +28,10 @@ imports:
   version: 241aa34d83b210ceaab7029c46e05794f2ea9797
 - name: github.com/magiconair/properties
   version: 0723e352fa358f9322c938cc2dadda874e9151a9
+- name: github.com/mattn/go-colorable
+  version: 5da554b8d30ea210af19ee14a058919661bf0d04
+- name: github.com/mattn/go-isatty
+  version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
 - name: github.com/mitchellh/mapstructure
   version: ca63d7c062ee3c9f34db231e352b60012b4fd0c1
 - name: github.com/pelletier/go-buffruneio
