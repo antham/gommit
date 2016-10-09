@@ -17,5 +17,5 @@ run-tests:
 test-all: gometalinter run-tests
 
 test-package:
-	go test -race -cover -coverprofile=/tmp/doc-hunt github.com/antham/doc-hunt/$(pkg)
-	go tool cover -html=/tmp/doc-hunt
+	go test -race -cover -coverprofile=/tmp/gommit github.com/antham/gommit/$(pkg)
+	go tool cover -html=/tmp/gommit
