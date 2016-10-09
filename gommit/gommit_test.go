@@ -9,7 +9,7 @@ import (
 )
 
 func TestFetchCommitsWithValidInterval(t *testing.T) {
-	err := exec.Command("./repo.sh").Run()
+	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)

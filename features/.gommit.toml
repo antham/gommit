@@ -1,0 +1,23 @@
+[config]
+check-merge-commit=false
+check-length-line=false
+
+[matchers]
+simple="(?:ref|feat|update)\\(.*?\\) : .*?\n(?:\n?.*?\n)*"
+[examples]
+a_new_feature="""
+feat(module) : An added feature
+
+New feature
+"""
+a_refactor="""
+ref(module) : Refactor module
+
+Refactor a module
+"""
+
+an_update="""
+update(module) : Update a file
+
+Update file
+"""
