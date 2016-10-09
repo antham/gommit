@@ -19,7 +19,7 @@ var info = func(message string) {
 	color.Cyan(message)
 }
 
-func renderInfos(infos *[]map[string]string) {
+var renderInfos = func(infos *[]map[string]string) {
 	for _, info := range *infos {
 		color.White("----")
 		fmt.Println()
@@ -33,7 +33,7 @@ func renderInfos(infos *[]map[string]string) {
 	}
 }
 
-func renderExamples(examples map[string]string) {
+var renderExamples = func(examples map[string]string) {
 	color.White("=======")
 	fmt.Println()
 

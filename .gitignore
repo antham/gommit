@@ -1,3 +1,4 @@
 /vendor/*
 /gommit/test/
 /coverage.txt
+/cmd/test/
