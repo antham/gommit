@@ -74,7 +74,7 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 	commits, err := FetchCommits(path, from, till)
 
 	if err != nil {
-		return &analysis, nil
+		return &analysis, fmt.Errorf(`Interval between "%s" and "%s" can't be fetched`, from, till)
 	}
 
 	if len(*commits) == 0 {

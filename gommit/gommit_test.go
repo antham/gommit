@@ -92,3 +92,11 @@ func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {
 	assert.EqualError(t, err, `No commits found between "master" and "master~2"`, "Must return an explicit message error")
 	assert.Len(t, *m, 0, "Must return no item")
 }
+
+func TestRunMatchingWithAnUnexistingCommitRange(t *testing.T) {
+	m, err := RunMatching("test/", "master~15", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"})
+
+	assert.Error(t, err, "Must return an error")
+	assert.EqualError(t, err, `Interval between "master~15" and "master" can't be fetched`, "Must return an explicit message error")
+	assert.Len(t, *m, 0, "Must return no item")
+}
