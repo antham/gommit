@@ -78,7 +78,7 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 	}
 
 	if len(*commits) == 0 {
-		return &analysis, fmt.Errorf("No commits found between %s and %s", from, till)
+		return &analysis, fmt.Errorf(`No commits found between "%s" and "%s"`, from, till)
 	}
 
 	for _, commit := range *commits {

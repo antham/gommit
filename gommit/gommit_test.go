@@ -89,6 +89,6 @@ func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {
 	m, err := RunMatching("test/", "master", "master~2", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"})
 
 	assert.Error(t, err, "Must return an error")
-	assert.EqualError(t, err, "No commits found between master and master~2", "Must return an explicit message error")
+	assert.EqualError(t, err, `No commits found between "master" and "master~2"`, "Must return an explicit message error")
 	assert.Len(t, *m, 0, "Must return no item")
 }
