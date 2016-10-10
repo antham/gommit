@@ -109,3 +109,36 @@ func TestIsValidSummaryLengthWithInCorrectSize(t *testing.T) {
 	assert.False(t, isValidSummaryLength("ttttttttttttttttttttttttttttttttttttttttttttttttttt"), "Must have a length lower than 50 characters")
 }
 
+func TestIsMergeCommitWithANonMergeCommit(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	commits, err := fetchCommits("test", "master~2", "master")
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	assert.False(t, isMergeCommit((*commits)[0]), "Must return false with non merge commit")
+}
+
+func TestIsMergeCommitWithAMergeCommit(t *testing.T) {
+	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
+		err := exec.Command(filename).Run()
+
+		if err != nil {
+			logrus.Fatal(err)
+		}
+	}
+
+	commits, err := fetchCommits("test", "master~2", "master")
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	assert.True(t, isMergeCommit((*commits)[0]), "Must return false with non merge commit")
+}

@@ -75,6 +75,11 @@ func isValidSummaryLength(summary string) bool {
 	return len(summary) <= MAX_SUMMARY_SIZE
 }
 
+// isMergeCommit return true if a commit is a merge commit
+func isMergeCommit(commit *git.Commit) bool {
+	return commit.ParentCount() == 2
+}
+
 // RunMatching trigger regexp matching against a range message commits
 func RunMatching(path string, from string, till string, matchers map[string]string) (*[]map[string]string, error) {
 	analysis := []map[string]string{}
