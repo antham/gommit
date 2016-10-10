@@ -82,7 +82,8 @@ func TestRunMatchingWithAnErrorCommit(t *testing.T) {
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
-	assert.Equal(t, (*m)[0]["message"], "feat(file2) : new file 2\n\ncreate a new file 2\n", "Must contains commit message")
+	assert.Equal(t, (*m)[0].Message, "feat(file2) : new file 2\n\ncreate a new file 2\n", "Must contains commit message")
+	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains error")
 }
 
 func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {

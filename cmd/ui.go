@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+
+	"github.com/antham/gommit/gommit"
 )
 
 var failure = func(err error) {
@@ -19,15 +21,20 @@ var info = func(message string) {
 	color.Cyan(message)
 }
 
-var renderInfos = func(infos *[]map[string]string) {
-	for _, info := range *infos {
+var renderErrors = func(errors *[]gommit.CommitError) {
+	for _, e := range *errors {
 		color.White("----")
 		fmt.Println()
 
-		fmt.Printf("%s%s\n", color.YellowString("Id      : "), color.WhiteString("%s", info["id"]))
+		if e.MessageError != nil {
+			fmt.Printf("%s%s\n", color.YellowString("Message error : "), color.RedString("%s", e.MessageError))
+		}
+
+		fmt.Printf("%s%s\n", color.YellowString("Id      : "), color.WhiteString("%s", e.ID))
+
 		color.Yellow("Message : ")
 
-		for _, field := range strings.Split(info["message"], "\n") {
+		for _, field := range strings.Split(e.Message, "\n") {
 			fmt.Printf("%s%s\n", color.YellowString("          "), color.WhiteString("%s", field))
 		}
 	}

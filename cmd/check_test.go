@@ -9,6 +9,8 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/antham/gommit/gommit"
 )
 
 func TestCheckWithErrors(t *testing.T) {
@@ -127,11 +129,11 @@ func TestCheckCommitsWithBadCommitMessage(t *testing.T) {
 
 	var w sync.WaitGroup
 
-	var infos *[]map[string]string
+	var errors *[]gommit.CommitError
 	var examples map[string]string
 
-	renderInfos = func(i *[]map[string]string) {
-		infos = i
+	renderErrors = func(e *[]gommit.CommitError) {
+		errors = e
 	}
 
 	renderExamples = func(e map[string]string) {
@@ -143,8 +145,8 @@ func TestCheckCommitsWithBadCommitMessage(t *testing.T) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil && r.(int) == 0 {
-				i := []map[string]string{}
-				infos = &i
+				e := []gommit.CommitError{}
+				errors = &e
 				examples = map[string]string{}
 			}
 
@@ -158,7 +160,7 @@ func TestCheckCommitsWithBadCommitMessage(t *testing.T) {
 
 	w.Wait()
 
-	assert.Len(t, *infos, 1, "Must return 1 commits")
+	assert.Len(t, *errors, 1, "Must return 1 commits")
 	assert.Len(t, examples, 3, "Must return 3 examples")
 }
 

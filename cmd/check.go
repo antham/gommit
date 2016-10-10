@@ -25,7 +25,7 @@ and return a list of commit that don't and exit with an error code.`,
 			exitError()
 		}
 
-		infos, err := gommit.RunMatching(path, from, to, viper.GetStringMapString("matchers"))
+		errors, err := gommit.RunMatching(path, from, to, viper.GetStringMapString("matchers"))
 
 		if err != nil {
 			failure(err)
@@ -33,8 +33,8 @@ and return a list of commit that don't and exit with an error code.`,
 			exitError()
 		}
 
-		if len(*infos) != 0 {
-			renderInfos(infos)
+		if len(*errors) != 0 {
+			renderErrors(errors)
 			renderExamples(viper.GetStringMapString("examples"))
 
 			exitError()

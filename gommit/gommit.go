@@ -8,6 +8,13 @@ import (
 	"github.com/libgit2/git2go"
 )
 
+// CommitError represents an error when something goes wrong
+type CommitError struct {
+	ID           string
+	Message      string
+	MessageError error
+}
+
 // MAX_SUMMARY_SIZE represents maximum length of accommit summary
 const MAX_SUMMARY_SIZE = 50
 
@@ -81,8 +88,8 @@ func isMergeCommit(commit *git.Commit) bool {
 }
 
 // RunMatching trigger regexp matching against a range message commits
-func RunMatching(path string, from string, till string, matchers map[string]string) (*[]map[string]string, error) {
-	analysis := []map[string]string{}
+func RunMatching(path string, from string, till string, matchers map[string]string) (*[]CommitError, error) {
+	analysis := []CommitError{}
 
 	commits, err := fetchCommits(path, from, till)
 
@@ -95,20 +102,21 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 	}
 
 	for _, commit := range *commits {
-		var ok bool
+		messageError := fmt.Errorf("No template match commit message")
 
 		for _, matcher := range matchers {
 			t, _ := messageMatchTemplate(commit.Message(), matcher)
 
 			if t {
-				ok = true
+				messageError = nil
 			}
 		}
 
-		if !ok {
-			analysis = append(analysis, map[string]string{
-				"id":      commit.Id().String(),
-				"message": commit.Message(),
+		if messageError != nil {
+			analysis = append(analysis, CommitError{
+				commit.Id().String(),
+				commit.Message(),
+				messageError,
 			})
 		}
 	}
