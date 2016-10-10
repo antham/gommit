@@ -100,3 +100,12 @@ func TestRunMatchingWithAnUnexistingCommitRange(t *testing.T) {
 	assert.EqualError(t, err, `Interval between "master~15" and "master" can't be fetched`, "Must return an explicit message error")
 	assert.Len(t, *m, 0, "Must return no item")
 }
+
+func TestIsValidSummaryLengthWithCorrectSize(t *testing.T) {
+	assert.True(t, isValidSummaryLength("test"), "Must have a length lower than 50 characters")
+}
+
+func TestIsValidSummaryLengthWithInCorrectSize(t *testing.T) {
+	assert.False(t, isValidSummaryLength("ttttttttttttttttttttttttttttttttttttttttttttttttttt"), "Must have a length lower than 50 characters")
+}
+

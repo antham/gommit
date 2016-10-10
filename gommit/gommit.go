@@ -8,6 +8,9 @@ import (
 	"github.com/libgit2/git2go"
 )
 
+// MAX_SUMMARY_SIZE represents maximum length of accommit summary
+const MAX_SUMMARY_SIZE = 50
+
 // fetchCommits retrieves all commits done in repository between 2 commits references
 func fetchCommits(repoPath string, from string, till string) (*[]*git.Commit, error) {
 	commits := []*git.Commit{}
@@ -65,6 +68,11 @@ func messageMatchTemplate(message string, template string) (bool, string) {
 	g := r.Matcher(msgByte, pcre.ANCHORED).Group(0)
 
 	return bytes.Equal(msgByte, g), string(g)
+}
+
+// isValidSummaryLength return true if size length is lower than 80 characters
+func isValidSummaryLength(summary string) bool {
+	return len(summary) <= MAX_SUMMARY_SIZE
 }
 
 // RunMatching trigger regexp matching against a range message commits
