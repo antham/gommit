@@ -8,8 +8,8 @@ import (
 	"github.com/libgit2/git2go"
 )
 
-// FetchCommits retrieves all commits done in repository between 2 commits references
-func FetchCommits(repoPath string, from string, till string) (*[]*git.Commit, error) {
+// fetchCommits retrieves all commits done in repository between 2 commits references
+func fetchCommits(repoPath string, from string, till string) (*[]*git.Commit, error) {
 	commits := []*git.Commit{}
 
 	repo, err := git.OpenRepository(repoPath)
@@ -56,8 +56,8 @@ func FetchCommits(repoPath string, from string, till string) (*[]*git.Commit, er
 	}
 }
 
-// MessageMatchTemplate try to match a commit message against a regexp
-func MessageMatchTemplate(message string, template string) (bool, string) {
+// messageMatchTemplate try to match a commit message against a regexp
+func messageMatchTemplate(message string, template string) (bool, string) {
 	r := pcre.MustCompile(template, pcre.ANCHORED)
 
 	msgByte := []byte(message)
@@ -71,7 +71,7 @@ func MessageMatchTemplate(message string, template string) (bool, string) {
 func RunMatching(path string, from string, till string, matchers map[string]string) (*[]map[string]string, error) {
 	analysis := []map[string]string{}
 
-	commits, err := FetchCommits(path, from, till)
+	commits, err := fetchCommits(path, from, till)
 
 	if err != nil {
 		return &analysis, fmt.Errorf(`Interval between "%s" and "%s" can't be fetched`, from, till)
@@ -85,7 +85,7 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 		var ok bool
 
 		for _, matcher := range matchers {
-			t, _ := MessageMatchTemplate(commit.Message(), matcher)
+			t, _ := messageMatchTemplate(commit.Message(), matcher)
 
 			if t {
 				ok = true

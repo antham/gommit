@@ -15,7 +15,7 @@ func TestFetchCommitsWithValidInterval(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	commits, err := FetchCommits("test", "master~2", "master")
+	commits, err := fetchCommits("test", "master~2", "master")
 	assert.NoError(t, err, "Must return no errors")
 
 	expected := []string{"update(file1) : update file 1", "feat(file2) : new file 2"}
@@ -28,12 +28,12 @@ func TestFetchCommitsWithValidInterval(t *testing.T) {
 }
 
 func TestFetchCommitsWithWrongRepository(t *testing.T) {
-	_, err := FetchCommits("testtesttest", "4906f72818c0185162a3ec9c39a711d7c2842d40", "master")
+	_, err := fetchCommits("testtesttest", "4906f72818c0185162a3ec9c39a711d7c2842d40", "master")
 	assert.Error(t, err, "Must return an error")
 }
 
 func TestFetchCommitsWithWrongInterval(t *testing.T) {
-	_, err := FetchCommits("test", "4906f72818c0185162a3ec9c39a711d7c2842d40", "maste")
+	_, err := fetchCommits("test", "4906f72818c0185162a3ec9c39a711d7c2842d40", "maste")
 	assert.Error(t, err, "Must return an error")
 }
 
@@ -41,7 +41,7 @@ func TestMessageMatchTemplate1(t *testing.T) {
 	msg := "(feat) : Hello world !"
 	temp := "\\((?:feat|test|bug)\\) : .*"
 
-	match, extractedGroup := MessageMatchTemplate(msg, temp)
+	match, extractedGroup := messageMatchTemplate(msg, temp)
 	assert.True(t, match, "Message must match template")
 	assert.Equal(t, msg, extractedGroup, "Must return extracted group")
 }
@@ -54,7 +54,7 @@ func TestMessageMatchTemplate2(t *testing.T) {
 
 	temp := "\\((?:feat|test|bug)\\) : .*?\n(?:\\* .*?\n)+"
 
-	match, extractedGroup := MessageMatchTemplate(msg, temp)
+	match, extractedGroup := messageMatchTemplate(msg, temp)
 	assert.True(t, match, "Message must match template")
 	assert.Equal(t, msg, extractedGroup, "Must return extracted group")
 }
@@ -65,7 +65,7 @@ func TestDontMessageMatchTemplate(t *testing.T) {
 
 	temp := "This is a test\n=> an added reaso\n"
 
-	match, extractedGroup := MessageMatchTemplate(msg, temp)
+	match, extractedGroup := messageMatchTemplate(msg, temp)
 	assert.False(t, match, "Message must not match template")
 	assert.NotEqual(t, msg, extractedGroup, "Must return extracted group")
 }
