@@ -1,6 +1,6 @@
 [config]
 check-merge-commit=false
-check-length-line=false
+check-summary-length=false
 
 [matchers]
 simple="(?:ref|feat|update)\\(.*?\\) : .*?\n(?:\n?.*?\n)*"

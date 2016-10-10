@@ -13,6 +13,7 @@ type CommitError struct {
 	ID           string
 	Message      string
 	MessageError error
+	SummaryError error
 }
 
 // MAX_SUMMARY_SIZE represents maximum length of accommit summary
@@ -88,7 +89,7 @@ func isMergeCommit(commit *git.Commit) bool {
 }
 
 // RunMatching trigger regexp matching against a range message commits
-func RunMatching(path string, from string, till string, matchers map[string]string) (*[]CommitError, error) {
+func RunMatching(path string, from string, till string, matchers map[string]string, options map[string]bool) (*[]CommitError, error) {
 	analysis := []CommitError{}
 
 	commits, err := fetchCommits(path, from, till)
@@ -103,6 +104,11 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 
 	for _, commit := range *commits {
 		messageError := fmt.Errorf("No template match commit message")
+		var summaryError error
+
+		if options["check-summary-length"] {
+			summaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
+		}
 
 		for _, matcher := range matchers {
 			t, _ := messageMatchTemplate(commit.Message(), matcher)
@@ -112,11 +118,16 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 			}
 		}
 
-		if messageError != nil {
+		if isValidSummaryLength(commit.Summary()) {
+			summaryError = nil
+		}
+
+		if messageError != nil || (summaryError != nil && options["check-summary-length"]) {
 			analysis = append(analysis, CommitError{
 				commit.Id().String(),
 				commit.Message(),
 				messageError,
+				summaryError,
 			})
 		}
 	}
