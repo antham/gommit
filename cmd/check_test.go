@@ -14,6 +14,12 @@ import (
 )
 
 func TestCheckWithErrors(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
 	path, err := os.Getwd()
 
 	if err != nil {
@@ -66,6 +72,18 @@ func TestCheckWithErrors(t *testing.T) {
 			"master~15",
 			"master",
 		},
+		[]string{
+			"check",
+			"master~1",
+			"master~2",
+			"test/",
+		},
+		[]string{
+			"check",
+			"master~1",
+			"master~2",
+			"test/",
+		},
 	}
 
 	errors := []error{
@@ -75,6 +93,19 @@ func TestCheckWithErrors(t *testing.T) {
 		fmt.Errorf(`Ensure "whatever" directory exists`),
 		fmt.Errorf(`"check.go" must be a directory`),
 		fmt.Errorf(`Interval between "master~15" and "master" can't be fetched`),
+		fmt.Errorf(`At least one matcher must be defined`),
+		fmt.Errorf(`At least one example must be defined`),
+	}
+
+	configs := []string{
+		path + "/../features/.gommit.toml",
+		path + "/../features/.gommit.toml",
+		path + "/../features/.gommit.toml",
+		path + "/../features/.gommit.toml",
+		path + "/../features/.gommit.toml",
+		path + "/../features/.gommit.toml",
+		path + "/../features/.gommit-no-matchers.toml",
+		path + "/../features/.gommit-no-examples.toml",
 	}
 
 	for i, a := range arguments {
@@ -91,7 +122,7 @@ func TestCheckWithErrors(t *testing.T) {
 				w.Done()
 			}()
 
-			os.Args = []string{"", "--config", path + "/../.gommit.toml"}
+			os.Args = []string{"", "--config", configs[i]}
 			os.Args = append(os.Args, a...)
 			_ = RootCmd.Execute()
 		}()

@@ -17,6 +17,14 @@ var checkCmd = &cobra.Command{
 	Long: `check verify your commmits follow templates you defined
 and return a list of commit that don't and exit with an error code.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		err := validateConfig()
+
+		if err != nil {
+			failure(err)
+
+			exitError()
+		}
+
 		from, to, path, err := extractArgs(args)
 
 		if err != nil {
@@ -84,6 +92,18 @@ func extractArgs(args []string) (string, string, string, error) {
 	}
 
 	return args[0], args[1], path, nil
+}
+
+func validateConfig() error {
+	if len(viper.GetStringMapString("matchers")) == 0 {
+		return fmt.Errorf("At least one matcher must be defined")
+	}
+
+	if len(viper.GetStringMapString("examples")) == 0 {
+		return fmt.Errorf("At least one example must be defined")
+	}
+
+	return nil
 }
 
 func init() {
