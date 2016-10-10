@@ -103,6 +103,10 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 	}
 
 	for _, commit := range *commits {
+		if options["exclude-merge-commits"] && isMergeCommit(commit) {
+			continue
+		}
+
 		messageError := fmt.Errorf("No template match commit message")
 		var summaryError error
 

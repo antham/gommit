@@ -77,7 +77,7 @@ func TestRunMatching(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false})
+	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false, "exclude-merge-commits": false})
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 0, "Must return no items, match was successful for every commit")
@@ -90,7 +90,7 @@ func TestRunMatchingWithAMessageErrorCommit(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false})
+	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false, "exclude-merge-commits": false})
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
@@ -108,13 +108,49 @@ func TestRunMatchingWithASummaryErrorCommit(t *testing.T) {
 		}
 	}
 
-	m, err := RunMatching("test/", "master~1", "master", map[string]string{"simple": ".*\n"}, map[string]bool{"check-summary-length": true})
+	m, err := RunMatching("test/", "master~1", "master", map[string]string{"simple": ".*\n"}, map[string]bool{"check-summary-length": true, "exclude-merge-commits": false})
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
 	assert.Equal(t, "A very long summary commit greater than minimum length 50\n", (*m)[0].Message, "Must contains commit message")
 	assert.NoError(t, (*m)[0].MessageError, "Must not contains error")
 	assert.EqualError(t, (*m)[0].SummaryError, "Commit summary length is greater than 50 characters", "Must contains summary message error")
+}
+
+func TestRunMatchingWithAMessageErrorCommitWithoutMergeCommist(t *testing.T) {
+	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
+		err := exec.Command(filename).Run()
+
+		if err != nil {
+			logrus.Fatal(err)
+		}
+	}
+
+	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false, "exclude-merge-commits": true})
+
+	assert.NoError(t, err, "Must return no errors")
+	assert.Len(t, *m, 1, "Must return one item")
+	assert.Equal(t, "feat(file) : new file 3\n\ncreate a new file 3\n", (*m)[0].Message, "Must contains commit message")
+	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
+	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
+}
+
+func TestRunMatchingWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
+	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
+		err := exec.Command(filename).Run()
+
+		if err != nil {
+			logrus.Fatal(err)
+		}
+	}
+
+	m, err := RunMatching("test/", "master~2", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false, "exclude-merge-commits": false})
+
+	assert.NoError(t, err, "Must return no errors")
+	assert.Len(t, *m, 2, "Must return two itesm")
+	assert.Equal(t, "Merge branch 'test'\n", (*m)[0].Message, "Must contains commit message")
+	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
+	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
 func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {
@@ -124,7 +160,7 @@ func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	m, err := RunMatching("test/", "master", "master~2", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false})
+	m, err := RunMatching("test/", "master", "master~2", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false, "exclude-merge-commits": false})
 
 	assert.Error(t, err, "Must return an error")
 	assert.EqualError(t, err, `No commits found between "master" and "master~2"`, "Must return an explicit message error")
@@ -138,7 +174,7 @@ func TestRunMatchingWithAnUnexistingCommitRange(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	m, err := RunMatching("test/", "master~15", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false})
+	m, err := RunMatching("test/", "master~15", "master", map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"}, map[string]bool{"check-summary-length": false, "exclude-merge-commits": false})
 
 	assert.Error(t, err, "Must return an error")
 	assert.EqualError(t, err, `Interval between "master~15" and "master" can't be fetched`, "Must return an explicit message error")

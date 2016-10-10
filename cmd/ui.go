@@ -26,17 +26,36 @@ var renderErrors = func(errors *[]gommit.CommitError) {
 		color.White("----")
 		fmt.Println()
 
-		if e.MessageError != nil {
-			fmt.Printf("%s%s\n", color.YellowString("Message error : "), color.RedString("%s", e.MessageError))
-		}
+		fmt.Printf("%s%s\n", color.YellowString("Id       : "), color.WhiteString("%s", e.ID))
 
-		fmt.Printf("%s%s\n", color.YellowString("Id      : "), color.WhiteString("%s", e.ID))
-
-		color.Yellow("Message : ")
+		color.Yellow("Message  : ")
 
 		for _, field := range strings.Split(e.Message, "\n") {
-			fmt.Printf("%s%s\n", color.YellowString("          "), color.WhiteString("%s", field))
+			fmt.Printf("%s%s\n", color.YellowString("           "), color.WhiteString("%s", field))
 		}
+
+		fmt.Println()
+
+		errs := []error{}
+
+		if e.MessageError != nil {
+			errs = append(errs, e.MessageError)
+		}
+
+		if e.SummaryError != nil {
+			errs = append(errs, e.SummaryError)
+		}
+
+		for i, e := range errs {
+			if i == 0 {
+				fmt.Printf("%s", color.YellowString("Error(s) : "))
+				fmt.Printf("- %s\n", color.RedString("%s", e.Error()))
+			} else {
+				fmt.Printf("           - %s\n", color.RedString("%s", e.Error()))
+			}
+		}
+
+		fmt.Println()
 	}
 }
 

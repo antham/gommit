@@ -1,5 +1,5 @@
 [config]
-check-merge-commit=false
+exclude-merge-commit=false
 check-summary-length=false
 
 [matchers]
