@@ -1,5 +1,7 @@
 language: go
 
+sudo: required
+
 go:
   - 1.7
 
@@ -9,15 +11,10 @@ before_install:
   - go get github.com/Masterminds/glide
   - go get github.com/alecthomas/gometalinter
   - gometalinter --install --update
-  - wget -O /tmp/libgit2.tar.gz https://github.com/libgit2/libgit2/archive/v0.24.1.tar.gz
-  - cd /tmp/ && tar xf libgit2.tar.gz && cd libgit2-0.24.1/ && cmake . && cd -
-  - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/tmp/libgit2
-  - cd $HOME/gopath/src/github.com/antham/gommit
 
-install: glide install
+install: glide install && ./install-libgit2.sh
 
-script:
-  make test-all
+script: make test-all
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
