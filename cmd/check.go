@@ -33,10 +33,18 @@ and return a list of commit that don't and exit with an error code.`,
 			exitError()
 		}
 
-		errors, err := gommit.RunMatching(path, from, to, viper.GetStringMapString("matchers"), map[string]bool{
-			"check-summary-length": viper.GetBool("config.check-summary-length"),
-			"exclude-merge-commit": viper.GetBool("exclude-merge-commit"),
-		})
+		q := gommit.Query{
+			Path:     path,
+			From:     from,
+			To:       to,
+			Matchers: viper.GetStringMapString("matchers"),
+			Options: map[string]bool{
+				"check-summary-length": viper.GetBool("config.check-summary-length"),
+				"exclude-merge-commit": viper.GetBool("exclude-merge-commit"),
+			},
+		}
+
+		errors, err := gommit.RunMatching(q)
 
 		if err != nil {
 			failure(err)

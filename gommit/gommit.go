@@ -16,11 +16,20 @@ type CommitError struct {
 	SummaryError error
 }
 
+// Query to retrieves commits and do checking
+type Query struct {
+	Path     string
+	From     string
+	To       string
+	Matchers map[string]string
+	Options  map[string]bool
+}
+
 // MAX_SUMMARY_SIZE represents maximum length of accommit summary
 const MAX_SUMMARY_SIZE = 50
 
 // fetchCommits retrieves all commits done in repository between 2 commits references
-func fetchCommits(repoPath string, from string, till string) (*[]*git.Commit, error) {
+func fetchCommits(repoPath string, from string, to string) (*[]*git.Commit, error) {
 	commits := []*git.Commit{}
 
 	repo, err := git.OpenRepository(repoPath)
@@ -35,7 +44,7 @@ func fetchCommits(repoPath string, from string, till string) (*[]*git.Commit, er
 		return &commits, err
 	}
 
-	err = w.PushRange(from + ".." + till)
+	err = w.PushRange(from + ".." + to)
 
 	if err != nil {
 		return &commits, err
@@ -89,32 +98,32 @@ func isMergeCommit(commit *git.Commit) bool {
 }
 
 // RunMatching trigger regexp matching against a range message commits
-func RunMatching(path string, from string, till string, matchers map[string]string, options map[string]bool) (*[]CommitError, error) {
+func RunMatching(query Query) (*[]CommitError, error) {
 	analysis := []CommitError{}
 
-	commits, err := fetchCommits(path, from, till)
+	commits, err := fetchCommits(query.Path, query.From, query.To)
 
 	if err != nil {
-		return &analysis, fmt.Errorf(`Interval between "%s" and "%s" can't be fetched`, from, till)
+		return &analysis, fmt.Errorf(`Interval between "%s" and "%s" can't be fetched`, query.From, query.To)
 	}
 
 	if len(*commits) == 0 {
-		return &analysis, fmt.Errorf(`No commits found between "%s" and "%s"`, from, till)
+		return &analysis, fmt.Errorf(`No commits found between "%s" and "%s"`, query.From, query.To)
 	}
 
 	for _, commit := range *commits {
-		if options["exclude-merge-commits"] && isMergeCommit(commit) {
+		if query.Options["exclude-merge-commits"] && isMergeCommit(commit) {
 			continue
 		}
 
 		messageError := fmt.Errorf("No template match commit message")
 		var summaryError error
 
-		if options["check-summary-length"] {
+		if query.Options["check-summary-length"] {
 			summaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
 		}
 
-		for _, matcher := range matchers {
+		for _, matcher := range query.Matchers {
 			t, _ := messageMatchTemplate(commit.Message(), matcher)
 
 			if t {
@@ -126,7 +135,7 @@ func RunMatching(path string, from string, till string, matchers map[string]stri
 			summaryError = nil
 		}
 
-		if messageError != nil || (summaryError != nil && options["check-summary-length"]) {
+		if messageError != nil || (summaryError != nil && query.Options["check-summary-length"]) {
 			analysis = append(analysis, CommitError{
 				commit.Id().String(),
 				commit.Message(),
