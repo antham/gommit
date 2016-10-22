@@ -97,6 +97,43 @@ func isMergeCommit(commit *git.Commit) bool {
 	return commit.ParentCount() == 2
 }
 
+// analyzeCommit check if a commit fit a query
+func analyzeCommit(commit *git.Commit, query *Query) *CommitError {
+	if query.Options["exclude-merge-commits"] && isMergeCommit(commit) {
+		return nil
+	}
+
+	messageError := fmt.Errorf("No template match commit message")
+	var summaryError error
+
+	if query.Options["check-summary-length"] {
+		summaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
+	}
+
+	for _, matcher := range query.Matchers {
+		t, _ := messageMatchTemplate(commit.Message(), matcher)
+
+		if t {
+			messageError = nil
+		}
+	}
+
+	if isValidSummaryLength(commit.Summary()) {
+		summaryError = nil
+	}
+
+	if messageError != nil || (summaryError != nil && query.Options["check-summary-length"]) {
+		return &CommitError{
+			commit.Id().String(),
+			commit.Message(),
+			messageError,
+			summaryError,
+		}
+	}
+
+	return nil
+}
+
 // RunMatching trigger regexp matching against a range message commits
 func RunMatching(query Query) (*[]CommitError, error) {
 	analysis := []CommitError{}
@@ -112,36 +149,9 @@ func RunMatching(query Query) (*[]CommitError, error) {
 	}
 
 	for _, commit := range *commits {
-		if query.Options["exclude-merge-commits"] && isMergeCommit(commit) {
-			continue
-		}
-
-		messageError := fmt.Errorf("No template match commit message")
-		var summaryError error
-
-		if query.Options["check-summary-length"] {
-			summaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
-		}
-
-		for _, matcher := range query.Matchers {
-			t, _ := messageMatchTemplate(commit.Message(), matcher)
-
-			if t {
-				messageError = nil
-			}
-		}
-
-		if isValidSummaryLength(commit.Summary()) {
-			summaryError = nil
-		}
-
-		if messageError != nil || (summaryError != nil && query.Options["check-summary-length"]) {
-			analysis = append(analysis, CommitError{
-				commit.Id().String(),
-				commit.Message(),
-				messageError,
-				summaryError,
-			})
+		commitError := analyzeCommit(commit, &query)
+		if commitError != nil {
+			analysis = append(analysis, *commitError)
 		}
 	}
 
