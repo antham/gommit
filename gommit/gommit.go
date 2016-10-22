@@ -25,8 +25,8 @@ type Query struct {
 	Options  map[string]bool
 }
 
-// MAX_SUMMARY_SIZE represents maximum length of accommit summary
-const MAX_SUMMARY_SIZE = 50
+// maxSummarySize represents maximum length of accommit summary
+const maxSummarySize = 50
 
 // fetchCommits retrieves all commits done in repository between 2 commits references
 func fetchCommits(repoPath string, from string, to string) (*[]*git.Commit, error) {
@@ -89,7 +89,7 @@ func messageMatchTemplate(message string, template string) (bool, string) {
 
 // isValidSummaryLength return true if size length is lower than 80 characters
 func isValidSummaryLength(summary string) bool {
-	return len(summary) <= MAX_SUMMARY_SIZE
+	return len(summary) <= maxSummarySize
 }
 
 // isMergeCommit return true if a commit is a merge commit
