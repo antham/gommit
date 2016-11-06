@@ -60,51 +60,64 @@ func (p *parser) parseBranchName() (string, error) {
 	for {
 		tok, lit = p.scan()
 
-		if tok == dot && buf == "" {
-			return "", fmt.Errorf("branch name must not start with a dot")
-		}
+		err := p.checkBranchNameToken(tok)
 
-		if tok == colon {
-			return "", fmt.Errorf("branch name must not contains any colon")
-		}
-
-		if tok == slash {
-			return "", fmt.Errorf("branch name must not end with a slash")
-		}
-
-		if tok == dot && previousTok == dot {
-			return "", fmt.Errorf("branch name must not contains any double dot")
-		}
-
-		if tok == space {
-			return "", fmt.Errorf("branch name contains a space character")
-		}
-
-		if tok == control {
-			return "", fmt.Errorf("branch name contains a control character")
+		if err != nil {
+			return "", err
 		}
 
 		if len(buf) > 4 {
 			subBuf = strings.ToLower(buf[len(buf)-5:])
 		}
 
-		if (tok == tilde || tok == caret || tok == eof) && subBuf == ".lock" {
-			return "", fmt.Errorf("branch name cannot end with .lock")
+		err = p.checkBranchNameConditions(tok, previousTok, buf, subBuf)
+
+		if err != nil {
+			return "", err
 		}
 
-		if tok == tilde || tok == caret {
+		switch tok {
+		case tilde, caret:
 			p.unscan()
-
 			return buf, nil
-		}
-
-		if tok == eof {
+		case eof:
 			return buf, nil
 		}
 
 		buf += lit
 		previousTok = tok
 	}
+}
+
+func (p *parser) checkBranchNameToken(tok token) error {
+	switch tok {
+	case colon:
+		return fmt.Errorf("branch name must not contains any colon")
+	case slash:
+		return fmt.Errorf("branch name must not end with a slash")
+	case space:
+		return fmt.Errorf("branch name contains a space character")
+	case control:
+		return fmt.Errorf("branch name contains a control character")
+	}
+
+	return nil
+}
+
+func (p *parser) checkBranchNameConditions(currentToken token, previousToken token, currentBuf string, subBuf string) error {
+	if currentToken == dot && currentBuf == "" {
+		return fmt.Errorf("branch name must not start with a dot")
+	}
+
+	if currentToken == dot && previousToken == dot {
+		return fmt.Errorf("branch name must not contains any double dot")
+	}
+
+	if (currentToken == tilde || currentToken == caret || currentToken == eof) && subBuf == ".lock" {
+		return fmt.Errorf("branch name cannot end with .lock")
+	}
+
+	return nil
 }
 
 func (p *parser) parseRefPath() ([]int, error) {
@@ -115,44 +128,18 @@ func (p *parser) parseRefPath() ([]int, error) {
 		tok, _ = p.scan()
 
 		if tok == caret {
-			nTok, nLit := p.scan()
-
-			if nTok != number {
-				p.unscan()
-				buf = append(buf, 1)
-				continue
-			}
-
-			level, err := strconv.Atoi(nLit)
+			err := p.parseCaretLevel(&buf)
 
 			if err != nil {
-				return buf, err
+				return nil, err
 			}
-
-			if level != 2 && level != 1 {
-				return buf, fmt.Errorf("level associated to a caret must be 1 or 2")
-			}
-
-			buf = append(buf, level)
 		}
 
 		if tok == tilde {
-			nTok, nLit := p.scan()
-
-			if nTok != number {
-				p.unscan()
-				buf = append(buf, 1)
-				continue
-			}
-
-			level, err := strconv.Atoi(nLit)
+			err := p.parseTildeLevel(&buf)
 
 			if err != nil {
-				return buf, err
-			}
-
-			for i := 0; i < level; i++ {
-				buf = append(buf, 1)
+				return nil, err
 			}
 		}
 
@@ -164,6 +151,52 @@ func (p *parser) parseRefPath() ([]int, error) {
 			return buf, fmt.Errorf("must be a caret or a tilde and may be followed with a number")
 		}
 	}
+}
+
+func (p *parser) parseCaretLevel(buf *[]int) error {
+	nTok, nLit := p.scan()
+
+	if nTok != number {
+		p.unscan()
+		*buf = append(*buf, 1)
+		return nil
+	}
+
+	level, err := strconv.Atoi(nLit)
+
+	if err != nil {
+		return err
+	}
+
+	if level != 2 && level != 1 {
+		return fmt.Errorf("level associated to a caret must be 1 or 2")
+	}
+
+	*buf = append(*buf, level)
+
+	return nil
+}
+
+func (p *parser) parseTildeLevel(buf *[]int) error {
+	nTok, nLit := p.scan()
+
+	if nTok != number {
+		p.unscan()
+		*buf = append(*buf, 1)
+		return nil
+	}
+
+	level, err := strconv.Atoi(nLit)
+
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < level; i++ {
+		*buf = append(*buf, 1)
+	}
+
+	return nil
 }
 
 // scan returns the next token from the underlying scanner.
