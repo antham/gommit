@@ -4,8 +4,7 @@ package reference
 type token int
 
 const (
-	illegal token = iota
-	eof
+	eof token = iota
 
 	colon
 	tilde
