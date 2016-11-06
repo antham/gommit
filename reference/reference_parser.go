@@ -85,7 +85,7 @@ func (p *parser) parseBranchName() (string, error) {
 		}
 
 		if len(buf) > 4 {
-			subBuf = strings.ToLower(buf[len(buf)-5 : len(buf)])
+			subBuf = strings.ToLower(buf[len(buf)-5:])
 		}
 
 		if (tok == tilde || tok == caret || tok == eof) && subBuf == ".lock" {
