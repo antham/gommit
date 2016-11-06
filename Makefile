@@ -5,6 +5,10 @@ version:
 	git commit -m "feat(version) : "$(v)
 	git tag v$(v) master
 
+compile:
+	git stash -u
+	gox -output "build/{{.Dir}}_{{.OS}}_{{.Arch}}"
+
 fmt:
 	find ! -path "./vendor/*" -name "*.go" -exec go fmt {} \;
 
