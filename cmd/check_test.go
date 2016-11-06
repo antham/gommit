@@ -69,8 +69,9 @@ func TestCheckWithErrors(t *testing.T) {
 		},
 		[]string{
 			"check",
-			"master~15",
+			"whatever",
 			"master",
+			"test/",
 		},
 		[]string{
 			"check",
@@ -92,7 +93,7 @@ func TestCheckWithErrors(t *testing.T) {
 		fmt.Errorf("3 arguments must be provided at most"),
 		fmt.Errorf(`Ensure "whatever" directory exists`),
 		fmt.Errorf(`"check.go" must be a directory`),
-		fmt.Errorf(`Interval between "master~15" and "master" can't be fetched`),
+		fmt.Errorf(`Can't find reference "whatever"`),
 		fmt.Errorf(`At least one matcher must be defined`),
 		fmt.Errorf(`At least one example must be defined`),
 	}

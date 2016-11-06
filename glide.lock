@@ -1,14 +1,10 @@
-hash: 5aaba06ee1baed795977bd74f854b5038c8aef1a0c26d6d61b61446ebc8a4f6c
-updated: 2016-10-23T22:22:54.264653471+02:00
+hash: b0c0eff115ba995807c27897fa455adc6b8c9a3ed3ef151319f0bd3be845f2dc
+updated: 2016-11-06T02:33:05.38348347+01:00
 imports:
 - name: github.com/fatih/color
   version: dea9d3a26a087187530244679c1cfb3a42937794
 - name: github.com/fsnotify/fsnotify
   version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
-- name: github.com/glenn-brown/golang-pkg-pcre
-  version: 48bb82a8b8ceea98f4e97825b43870f6ba1970d6
-  subpackages:
-  - src/pkg/pcre
 - name: github.com/hashicorp/hcl
   version: ef8133da8cda503718a74741312bf50821e6de79
   subpackages:
@@ -24,8 +20,6 @@ imports:
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/kr/fs
   version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
-- name: github.com/libgit2/git2go
-  version: 53594d7581617dbae7bb5960b4ac5f0ff513c184
 - name: github.com/magiconair/properties
   version: 0723e352fa358f9322c938cc2dadda874e9151a9
 - name: github.com/mattn/go-colorable

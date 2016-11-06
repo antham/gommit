@@ -12,7 +12,7 @@ before_install:
   - go get github.com/alecthomas/gometalinter
   - gometalinter --install --update
 
-install: glide install && ./install-libgit2.sh
+install: glide install
 
 script: make test-all
 

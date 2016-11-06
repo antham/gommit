@@ -18,12 +18,15 @@ func TestFetchCommitsWithValidInterval(t *testing.T) {
 	commits, err := fetchCommits("test", "master~2", "master")
 	assert.NoError(t, err, "Must return no errors")
 
-	expected := []string{"update(file1) : update file 1", "feat(file2) : new file 2"}
+	expected := []string{
+		"update(file1) : update file 1\n\nupdate file 1 with a text\n",
+		"feat(file2) : new file 2\n\ncreate a new file 2\n",
+	}
 
 	assert.Len(t, *commits, 2, "Must contains 2 commits")
 
 	for i, c := range *commits {
-		assert.Equal(t, expected[i], c.Summary(), "Wrong commit fetched from repository")
+		assert.Equal(t, expected[i], c.Message, "Wrong commit fetched from repository")
 	}
 }
 
@@ -41,9 +44,8 @@ func TestMessageMatchTemplate1(t *testing.T) {
 	msg := "(feat) : Hello world !"
 	temp := "\\((?:feat|test|bug)\\) : .*"
 
-	match, extractedGroup := messageMatchTemplate(msg, temp)
+	match := messageMatchTemplate(msg, temp)
 	assert.True(t, match, "Message must match template")
-	assert.Equal(t, msg, extractedGroup, "Must return extracted group")
 }
 
 func TestMessageMatchTemplate2(t *testing.T) {
@@ -54,9 +56,8 @@ func TestMessageMatchTemplate2(t *testing.T) {
 
 	temp := "\\((?:feat|test|bug)\\) : .*?\n(?:\\* .*?\n)+"
 
-	match, extractedGroup := messageMatchTemplate(msg, temp)
+	match := messageMatchTemplate(msg, temp)
 	assert.True(t, match, "Message must match template")
-	assert.Equal(t, msg, extractedGroup, "Must return extracted group")
 }
 
 func TestDontMessageMatchTemplate(t *testing.T) {
@@ -65,9 +66,8 @@ func TestDontMessageMatchTemplate(t *testing.T) {
 
 	temp := "This is a test\n=> an added reaso\n"
 
-	match, extractedGroup := messageMatchTemplate(msg, temp)
+	match := messageMatchTemplate(msg, temp)
 	assert.False(t, match, "Message must not match template")
-	assert.NotEqual(t, msg, extractedGroup, "Must return extracted group")
 }
 
 func TestRunMatching(t *testing.T) {
@@ -253,8 +253,7 @@ func TestRunMatchingWithAnUnexistingCommitRange(t *testing.T) {
 
 	m, err := RunMatching(q)
 
-	assert.Error(t, err, "Must return an error")
-	assert.EqualError(t, err, `Interval between "master~15" and "master" can't be fetched`, "Must return an explicit message error")
+	assert.EqualError(t, err, "Can't find reference", "Must return an error")
 	assert.Len(t, *m, 0, "Must return no item")
 }
 

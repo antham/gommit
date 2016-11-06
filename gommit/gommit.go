@@ -1,11 +1,13 @@
 package gommit
 
 import (
-	"bytes"
 	"fmt"
+	"regexp"
+	"strings"
 
-	"github.com/glenn-brown/golang-pkg-pcre/src/pkg/pcre"
-	"github.com/libgit2/git2go"
+	"gopkg.in/src-d/go-git.v4"
+
+	"github.com/antham/gommit/reference"
 )
 
 // CommitError represents an error when something goes wrong
@@ -30,71 +32,34 @@ const maxSummarySize = 50
 
 // fetchCommits retrieves all commits done in repository between 2 commits references
 func fetchCommits(repoPath string, from string, to string) (*[]*git.Commit, error) {
-	commits := []*git.Commit{}
-
-	repo, err := git.OpenRepository(repoPath)
+	repo, err := git.NewFilesystemRepository(repoPath + "/.git/")
 
 	if err != nil {
-		return &commits, err
+		return nil, err
 	}
 
-	w, err := repo.Walk()
-
-	if err != nil {
-		return &commits, err
-	}
-
-	err = w.PushRange(from + ".." + to)
-
-	if err != nil {
-		return &commits, err
-	}
-
-	prevOid := git.Oid{}
-	currOid := &git.Oid{}
-
-	for {
-		err := w.Next(currOid)
-
-		if git.IsErrorCode(err, git.ErrEOF) {
-			return &commits, nil
-		}
-
-		if currOid.Equal(&prevOid) {
-			return &commits, nil
-		}
-
-		prevOid = *currOid
-
-		c, err := repo.LookupCommit(currOid)
-
-		if err != nil {
-			return &commits, err
-		}
-
-		commits = append(commits, c)
-	}
+	return reference.FetchCommitInterval(repo, from, to)
 }
 
 // messageMatchTemplate try to match a commit message against a regexp
-func messageMatchTemplate(message string, template string) (bool, string) {
-	r := pcre.MustCompile(template, pcre.ANCHORED)
+func messageMatchTemplate(message string, template string) bool {
+	r := regexp.MustCompile(template)
 
-	msgByte := []byte(message)
+	g := r.FindStringSubmatch(message)
 
-	g := r.Matcher(msgByte, pcre.ANCHORED).Group(0)
-
-	return bytes.Equal(msgByte, g), string(g)
+	return len(g) > 0 && g[0] == message
 }
 
 // isValidSummaryLength return true if size length is lower than 80 characters
-func isValidSummaryLength(summary string) bool {
-	return len(summary) <= maxSummarySize
+func isValidSummaryLength(message string) bool {
+	chunks := strings.Split(message, "\n")
+
+	return len(chunks) == 0 || len(chunks[0]) <= maxSummarySize
 }
 
 // isMergeCommit return true if a commit is a merge commit
 func isMergeCommit(commit *git.Commit) bool {
-	return commit.ParentCount() == 2
+	return commit.NumParents() == 2
 }
 
 // analyzeCommit check if a commit fit a query
@@ -111,21 +76,21 @@ func analyzeCommit(commit *git.Commit, query *Query) *CommitError {
 	}
 
 	for _, matcher := range query.Matchers {
-		t, _ := messageMatchTemplate(commit.Message(), matcher)
+		t := messageMatchTemplate(commit.Message, matcher)
 
 		if t {
 			messageError = nil
 		}
 	}
 
-	if isValidSummaryLength(commit.Summary()) {
+	if isValidSummaryLength(commit.Message) {
 		summaryError = nil
 	}
 
 	if messageError != nil || (summaryError != nil && query.Options["check-summary-length"]) {
 		return &CommitError{
-			commit.Id().String(),
-			commit.Message(),
+			commit.ID().String(),
+			commit.Message,
 			messageError,
 			summaryError,
 		}
@@ -141,7 +106,7 @@ func RunMatching(query Query) (*[]CommitError, error) {
 	commits, err := fetchCommits(query.Path, query.From, query.To)
 
 	if err != nil {
-		return &analysis, fmt.Errorf(`Interval between "%s" and "%s" can't be fetched`, query.From, query.To)
+		return &analysis, err
 	}
 
 	if len(*commits) == 0 {
