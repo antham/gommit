@@ -1,8 +1,8 @@
-hash: 38bc7fa6a73bcd5adededb798ecf5c8bc16be1c38b831ee1c9024d3a9053c748
-updated: 2016-09-29T21:16:50.316251502+02:00
+hash: 5aaba06ee1baed795977bd74f854b5038c8aef1a0c26d6d61b61446ebc8a4f6c
+updated: 2016-10-23T22:22:54.264653471+02:00
 imports:
 - name: github.com/fatih/color
-  version: 87d4004f2ab62d0d255e0a38f1680aa534549fe3
+  version: dea9d3a26a087187530244679c1cfb3a42937794
 - name: github.com/fsnotify/fsnotify
   version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
 - name: github.com/glenn-brown/golang-pkg-pcre
@@ -25,7 +25,7 @@ imports:
 - name: github.com/kr/fs
   version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
 - name: github.com/libgit2/git2go
-  version: 241aa34d83b210ceaab7029c46e05794f2ea9797
+  version: 53594d7581617dbae7bb5960b4ac5f0ff513c184
 - name: github.com/magiconair/properties
   version: 0723e352fa358f9322c938cc2dadda874e9151a9
 - name: github.com/mattn/go-colorable
@@ -42,6 +42,10 @@ imports:
   version: a887431f7f6ef7687b556dbf718d9f351d4858a0
 - name: github.com/pkg/sftp
   version: 8197a2e580736b78d704be0fc47b2324c0591a32
+- name: github.com/sergi/go-diff
+  version: 1d28411638c1e67fe1930830df207bef72496ae9
+  subpackages:
+  - diffmatchpatch
 - name: github.com/Sirupsen/logrus
   version: 3ec0642a7fb6488f65b06f9040adc67e3990296a
 - name: github.com/spf13/afero
@@ -67,6 +71,7 @@ imports:
   version: 8e06e8ddd9629eb88639aba897641bff8031f1d3
   subpackages:
   - ssh
+  - ssh/agent
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
@@ -79,6 +84,32 @@ imports:
   subpackages:
   - transform
   - unicode/norm
+- name: gopkg.in/gcfg.v1
+  version: 27e4946190b4a327b539185f2b5b1f7c84730728
+  subpackages:
+  - scanner
+  - token
+  - types
+- name: gopkg.in/src-d/go-git.v4
+  version: d0ea76c141cb2fab330b769234046afad615c299
+  subpackages:
+  - core
+  - clients
+  - clients/common
+  - config
+  - diff
+  - formats/packfile
+  - storage/filesystem
+  - storage/memory
+  - utils/fs
+  - clients/http
+  - clients/ssh
+  - formats/packp/pktline
+  - formats/idxfile
+  - formats/objfile
+  - storage/filesystem/internal/dotgit
+- name: gopkg.in/warnings.v0
+  version: 8a331561fe74dadba6edfc59f3be66c22c3b065d
 - name: gopkg.in/yaml.v2
   version: 31c299268d302dd0aa9a0dcf765a3d58971ac83f
 devImports: []
