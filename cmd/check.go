@@ -39,8 +39,8 @@ and return a list of commit that don't and exit with an error code.`,
 			To:       to,
 			Matchers: viper.GetStringMapString("matchers"),
 			Options: map[string]bool{
-				"check-summary-length": viper.GetBool("config.check-summary-length"),
-				"exclude-merge-commit": viper.GetBool("exclude-merge-commit"),
+				"check-summary-length":  viper.GetBool("config.check-summary-length"),
+				"exclude-merge-commits": viper.GetBool("config.exclude-merge-commits"),
 			},
 		}
 
