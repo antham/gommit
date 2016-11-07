@@ -3,6 +3,8 @@ package reference
 import (
 	"bytes"
 	"fmt"
+	"strings"
+
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/core"
 )
@@ -16,13 +18,7 @@ type refSolver struct {
 
 // newRefSolver creates a new RefSolver object
 func newRefSolver(stmt *symbolicRefPathStmt, repo *git.Repository) (*refSolver, error) {
-	iterRef, err := repo.Refs()
-
-	if err != nil {
-		return nil, err
-	}
-
-	hash, err := resolveHash(stmt.branchName, iterRef)
+	hash, err := resolveHash(stmt.branchName, repo)
 
 	if err != nil {
 		return nil, err
@@ -55,10 +51,24 @@ func newRefSolver(stmt *symbolicRefPathStmt, repo *git.Repository) (*refSolver, 
 }
 
 // resolveHash give hash commit for a given string reference
-func resolveHash(branchName string, iter core.ReferenceIter) (core.Hash, error) {
+func resolveHash(branchName string, repository *git.Repository) (core.Hash, error) {
 	hash := core.Hash{}
 
-	err := iter.ForEach(func(ref *core.Reference) error {
+	if strings.ToLower(branchName) == "head" {
+		head, err := repository.Head()
+
+		if err == nil {
+			return head.Hash(), nil
+		}
+	}
+
+	iter, err := repository.Refs()
+
+	if err != nil {
+		return core.Hash{}, err
+	}
+
+	err = iter.ForEach(func(ref *core.Reference) error {
 		if ref.Name().Short() == branchName {
 			hash = ref.Hash()
 		}

@@ -236,6 +236,28 @@ func TestFetchCommitIntervalWithTwoDifferentBranches(t *testing.T) {
 	assert.Equal(t, expected, results, "Must return a commit history subtree")
 }
 
+func TestFetchCommitIntervalWithHeadReference(t *testing.T) {
+	commits, err := fetchCommitFromAGivenInterval("test2", "HEAD")
+
+	assert.NoError(t, err, "Must return no error")
+
+	expected := []string{
+		"feat(file10) : new file 10\n\ncreate a new file 10\n",
+		"feat(file9) : new file 9\n\ncreate a new file 9\n",
+		"Merge branch 'test'\n",
+		"Merge branch 'test1' into test\n",
+		"Merge branch 'test2' into test1\n",
+	}
+
+	results := []string{}
+
+	for _, c := range commits {
+		results = append(results, c.Message)
+	}
+
+	assert.Equal(t, expected, results, "Must return a commit history subtree")
+}
+
 func TestFetchCommitIntervalWithUnexistingRange(t *testing.T) {
 	commits, err := fetchCommitFromAGivenInterval("master~25", "master~30")
 
