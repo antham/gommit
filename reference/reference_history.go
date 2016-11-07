@@ -3,22 +3,19 @@ package reference
 import (
 	"bytes"
 	"fmt"
-
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/core"
 )
 
-// history match a SymbolicRefPathStmt against
-// a repository to resolve commit history and commit reference
-type history struct {
-	stmt          *symbolicRefPathStmt
-	commitRef     *git.Commit
-	commitHistory []*git.Commit
+// refSolver match a SymbolicRefPathStmt against
+// a repository to resolve commit refSolver and commit reference
+type refSolver struct {
+	stmt      *symbolicRefPathStmt
+	commitRef *git.Commit
 }
 
-// newHistory creates a new History object
-func newHistory(stmt *symbolicRefPathStmt, repo *git.Repository) (*history, error) {
-	commitHistory := []*git.Commit{}
+// newRefSolver creates a new RefSolver object
+func newRefSolver(stmt *symbolicRefPathStmt, repo *git.Repository) (*refSolver, error) {
 	iterRef, err := repo.Refs()
 
 	if err != nil {
@@ -32,7 +29,6 @@ func newHistory(stmt *symbolicRefPathStmt, repo *git.Repository) (*history, erro
 	}
 
 	commitRef, _ := repo.Commit(hash)
-	commitHistory = append(commitHistory, commitRef)
 
 	for _, path := range stmt.refPath {
 		parents := commitRef.Parents()
@@ -50,14 +46,12 @@ func newHistory(stmt *symbolicRefPathStmt, repo *git.Repository) (*history, erro
 			}
 
 			if path == i {
-				commitHistory = append(commitHistory, commit)
-
 				commitRef = commit
 			}
 		}
 	}
 
-	return &history{stmt, commitRef, commitHistory}, nil
+	return &refSolver{stmt, commitRef}, nil
 }
 
 // resolveHash give hash commit for a given string reference
@@ -83,21 +77,58 @@ func resolveHash(branchName string, iter core.ReferenceIter) (core.Hash, error) 
 	return hash, nil
 }
 
-// parseHistoryInterval return commits between two intervals
-func parseHistoryInterval(from *history, to *history) (*[]*git.Commit, error) {
+// retrieveCommitPath fetch all commits between 2 references
+func retrieveCommitPath(from *git.Commit, to *git.Commit) (*[]*git.Commit, error) {
 	results := []*git.Commit{}
-	commits := []*git.Commit{}
+	parents := []*git.Commit{}
 
-	for i, c := range from.commitHistory {
-		if c.ID() == to.commitRef.ID() {
-			commits = from.commitHistory[i:]
+	err := to.Parents().ForEach(
+		func(c *git.Commit) error {
+			parents = append(parents, c)
 
-			break
+			return nil
+		})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if to.ID() == from.ID() {
+		results = append(results, to)
+
+		return &results, nil
+	}
+
+	for i := 0; i < to.NumParents(); i++ {
+		cs, err := retrieveCommitPath(from, parents[i])
+
+		if err != nil {
+			return nil, err
+		}
+
+		if len(*cs) > 0 {
+			results = append(results, to)
+			results = append(results, *cs...)
+
+			return &results, nil
 		}
 	}
 
-	for i := 0; i < len(commits)-1; i++ {
-		cs, errs := parseTree(commits[i], commits[i+1])
+	return &results, nil
+}
+
+// parseCommitHistory return commits between two intervals
+func parseCommitHistory(from *refSolver, to *refSolver) (*[]*git.Commit, error) {
+	results := []*git.Commit{}
+
+	commits, err := retrieveCommitPath(from.commitRef, to.commitRef)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < len(*commits)-1; i++ {
+		cs, errs := parseTree((*commits)[i], (*commits)[i+1])
 
 		if len(errs) > 0 {
 			return nil, fmt.Errorf("An error occured when retrieving commits between %s and %s", from.commitRef.ID(), to.commitRef.ID())
@@ -149,34 +180,33 @@ func parseTree(commit *git.Commit, bound *git.Commit) ([]*git.Commit, []error) {
 	return commits, errors
 }
 
-// FetchCommitInterval retrieves commit history in a given interval for a repository
+// FetchCommitInterval retrieves commit refSolver in a given interval for a repository
 func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*git.Commit, error) {
-
-	refHistoryFrom := newParser(bytes.NewBufferString(from))
-	fromStmt, err := refHistoryFrom.parseSymbolicReferencePath()
-
-	if err != nil {
-		return &[]*git.Commit{}, err
-	}
-
-	refHistoryTo := newParser(bytes.NewBufferString(to))
-	toStmt, err := refHistoryTo.parseSymbolicReferencePath()
+	refRefSolverFrom := newParser(bytes.NewBufferString(from))
+	fromStmt, err := refRefSolverFrom.parseSymbolicReferencePath()
 
 	if err != nil {
 		return &[]*git.Commit{}, err
 	}
 
-	fromHistory, err := newHistory(fromStmt, repo)
+	refRefSolverTo := newParser(bytes.NewBufferString(to))
+	toStmt, err := refRefSolverTo.parseSymbolicReferencePath()
 
 	if err != nil {
 		return &[]*git.Commit{}, err
 	}
 
-	toHistory, err := newHistory(toStmt, repo)
+	fromRefSolver, err := newRefSolver(fromStmt, repo)
 
 	if err != nil {
 		return &[]*git.Commit{}, err
 	}
 
-	return parseHistoryInterval(fromHistory, toHistory)
+	toRefSolver, err := newRefSolver(toStmt, repo)
+
+	if err != nil {
+		return &[]*git.Commit{}, err
+	}
+
+	return parseCommitHistory(fromRefSolver, toRefSolver)
 }
