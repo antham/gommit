@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,6 +32,16 @@ and return a list of commit that don't and exit with an error code.`,
 			failure(err)
 
 			exitError()
+		}
+
+		for name, matcher := range viper.GetStringMapString("matchers") {
+			_, err := regexp.Compile(matcher)
+
+			if err != nil {
+				failure(fmt.Errorf(`Regexp "%s" is not a valid regexp, please check the syntax`, name))
+
+				exitError()
+			}
 		}
 
 		q := gommit.Query{
