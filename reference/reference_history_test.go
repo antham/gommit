@@ -11,7 +11,6 @@ import (
 )
 
 // Result correctness is checked against git log
-
 func fetchCommitFromAGivenInterval(from string, to string) ([]*git.Commit, error) {
 	for _, filename := range []string{"../features/repo.sh", "../features/merge-commits.sh"} {
 		err := exec.Command(filename).Run()
@@ -263,4 +262,62 @@ func TestFetchCommitIntervalWithUnexistingRange(t *testing.T) {
 
 	assert.EqualError(t, err, "Can't find reference", "Must return an error, interval doesn't exist")
 	assert.Equal(t, []*git.Commit{}, commits, "Must contains no datas")
+}
+
+func TestFetchCommitByID(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	path, err := os.Getwd()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	repo, err := git.NewFilesystemRepository(path + "/test/.git/")
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = "test"
+
+	ID, err := cmd.Output()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	commit, err := FetchCommitByID(repo, string(ID[:len(ID)-1]))
+
+	assert.NoError(t, err, "Must return no errors")
+	assert.Equal(t, "update(file1) : update file 1\n\nupdate file 1 with a text\n", commit.Message, "Must return commit linked to this id")
+}
+
+func TestFetchCommitByIDWithAWrongCommitID(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	path, err := os.Getwd()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	repo, err := git.NewFilesystemRepository(path + "/test/.git/")
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	_, err = FetchCommitByID(repo, "whatever")
+
+	assert.Error(t, err, "Must return an error")
 }

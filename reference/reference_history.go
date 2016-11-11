@@ -220,3 +220,10 @@ func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*git.
 
 	return parseCommitHistory(fromRefSolver, toRefSolver)
 }
+
+// FetchCommitByID retrieves a single commit from a repository
+func FetchCommitByID(repo *git.Repository, ID string) (*git.Commit, error) {
+	hash := core.NewHash(ID)
+
+	return repo.Commit(hash)
+}
