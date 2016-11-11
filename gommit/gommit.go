@@ -10,16 +10,23 @@ import (
 	"github.com/antham/gommit/reference"
 )
 
-// CommitError represents an error when something goes wrong
-type CommitError struct {
-	ID           string
-	Message      string
+// Matching represents an error when something goes wrong
+type Matching struct {
+	Context      map[string]string
 	MessageError error
 	SummaryError error
 }
 
-// Query to retrieves commits and do checking
-type Query struct {
+// CommitQuery to retrieves a commit and do checking
+type CommitQuery struct {
+	Path     string
+	ID       string
+	Matchers map[string]string
+	Options  map[string]bool
+}
+
+// RangeCommitQuery to retrieves commits and do checking
+type RangeCommitQuery struct {
 	Path     string
 	From     string
 	To       string
@@ -27,10 +34,17 @@ type Query struct {
 	Options  map[string]bool
 }
 
+// MessageQuery to check only commit message
+type MessageQuery struct {
+	Message  string
+	Matchers map[string]string
+	Options  map[string]bool
+}
+
 // maxSummarySize represents maximum length of accommit summary
 const maxSummarySize = 50
 
-// fetchCommits retrieves all commits done in repository between 2 commits references
+// fetchCommits retrieves all commits in repository between 2 commits references
 func fetchCommits(repoPath string, from string, to string) (*[]*git.Commit, error) {
 	repo, err := git.NewFilesystemRepository(repoPath + "/.git/")
 
@@ -39,6 +53,17 @@ func fetchCommits(repoPath string, from string, to string) (*[]*git.Commit, erro
 	}
 
 	return reference.FetchCommitInterval(repo, from, to)
+}
+
+// fetchCommit retrieve a single commit in repository from its ID
+func fetchCommit(repoPath string, ID string) (*git.Commit, error) {
+	repo, err := git.NewFilesystemRepository(repoPath + "/.git/")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return reference.FetchCommitByID(repo, ID)
 }
 
 // messageMatchTemplate try to match a commit message against a regexp
@@ -62,63 +87,101 @@ func isMergeCommit(commit *git.Commit) bool {
 	return commit.NumParents() == 2
 }
 
-// analyzeCommit check if a commit fit a query
-func analyzeCommit(commit *git.Commit, query *Query) *CommitError {
-	if query.Options["exclude-merge-commits"] && isMergeCommit(commit) {
-		return nil
-	}
-
-	messageError := fmt.Errorf("No template match commit message")
-	var summaryError error
-
-	if query.Options["check-summary-length"] {
-		summaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
-	}
-
-	for _, matcher := range query.Matchers {
-		t := messageMatchTemplate(commit.Message, matcher)
-
-		if t {
-			messageError = nil
-		}
-	}
-
-	if isValidSummaryLength(commit.Message) {
-		summaryError = nil
-	}
-
-	if messageError != nil || (summaryError != nil && query.Options["check-summary-length"]) {
-		return &CommitError{
-			commit.ID().String(),
-			commit.Message,
-			messageError,
-			summaryError,
-		}
-	}
-
-	return nil
+// IsZeroMatching check if Matching struct equals zero
+func IsZeroMatching(matching *Matching) bool {
+	return len(matching.Context) == 0 && matching.MessageError == nil && matching.SummaryError == nil
 }
 
-// RunMatching trigger regexp matching against a range message commits
-func RunMatching(query Query) (*[]CommitError, error) {
-	analysis := []CommitError{}
+// analyzeMessage check if a message match
+func analyzeMessage(message string, matchers map[string]string, options map[string]bool) *Matching {
+	matching := Matching{}
+	matchTemplate := false
+	hasError := false
 
+	for _, matcher := range matchers {
+		t := messageMatchTemplate(message, matcher)
+
+		if t {
+			matchTemplate = true
+		}
+	}
+
+	if options["check-summary-length"] && !isValidSummaryLength(message) {
+		hasError = true
+		matching.SummaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
+	}
+
+	if !matchTemplate {
+		hasError = true
+		matching.MessageError = fmt.Errorf("No template match commit message")
+	}
+
+	if hasError {
+		matching.Context = map[string]string{"message": message}
+	}
+
+	return &matching
+}
+
+// analyzeCommit check if a commit match
+func analyzeCommit(commit *git.Commit, matchers map[string]string, options map[string]bool) *Matching {
+	if options["exclude-merge-commits"] && isMergeCommit(commit) {
+		return &Matching{}
+	}
+
+	m := analyzeMessage(commit.Message, matchers, options)
+
+	if IsZeroMatching(m) {
+		return &Matching{}
+	}
+
+	m.Context["ID"] = commit.ID().String()
+
+	return m
+}
+
+// analyzeCommits check if a slice of commits match
+func analyzeCommits(commits *[]*git.Commit, matchers map[string]string, options map[string]bool) *[]*Matching {
+	matchings := []*Matching{}
+
+	for _, commit := range *commits {
+		matching := analyzeCommit(commit, matchers, options)
+
+		if !IsZeroMatching(matching) {
+			matchings = append(matchings, matching)
+		}
+	}
+
+	return &matchings
+}
+
+// MatchMessageQuery trigger regexp matching against a message
+func MatchMessageQuery(query MessageQuery) (*Matching, error) {
+	return analyzeMessage(query.Message, query.Matchers, query.Options), nil
+}
+
+// MatchCommitQuery trigger regexp matching against a commit
+func MatchCommitQuery(query CommitQuery) (*Matching, error) {
+	commit, err := fetchCommit(query.Path, query.ID)
+
+	if err != nil {
+		return &Matching{}, err
+	} else if commit == nil {
+		return &Matching{}, fmt.Errorf(`No commits found between with ID : "%s"`, query.ID)
+	}
+
+	return analyzeCommit(commit, query.Matchers, query.Options), nil
+}
+
+// MatchRangeCommitQuery trigger regexp matching against a range message commits
+func MatchRangeCommitQuery(query RangeCommitQuery) (*[]*Matching, error) {
 	commits, err := fetchCommits(query.Path, query.From, query.To)
 
 	if err != nil {
-		return &analysis, err
+		return &[]*Matching{}, err
+	} else if len(*commits) == 0 {
+		return &[]*Matching{}, fmt.Errorf(`No commits found between "%s" and "%s"`, query.From, query.To)
 	}
 
-	if len(*commits) == 0 {
-		return &analysis, fmt.Errorf(`No commits found between "%s" and "%s"`, query.From, query.To)
-	}
-
-	for _, commit := range *commits {
-		commitError := analyzeCommit(commit, &query)
-		if commitError != nil {
-			analysis = append(analysis, *commitError)
-		}
-	}
-
-	return &analysis, nil
+	return analyzeCommits(commits, query.Matchers, query.Options), nil
 }
