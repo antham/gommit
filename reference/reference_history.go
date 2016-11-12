@@ -51,10 +51,10 @@ func newRefSolver(stmt *symbolicRefPathStmt, repo *git.Repository) (*refSolver, 
 }
 
 // resolveHash give hash commit for a given string reference
-func resolveHash(branchName string, repository *git.Repository) (core.Hash, error) {
+func resolveHash(refCommit string, repository *git.Repository) (core.Hash, error) {
 	hash := core.Hash{}
 
-	if strings.ToLower(branchName) == "head" {
+	if strings.ToLower(refCommit) == "head" {
 		head, err := repository.Head()
 
 		if err == nil {
@@ -69,22 +69,26 @@ func resolveHash(branchName string, repository *git.Repository) (core.Hash, erro
 	}
 
 	err = iter.ForEach(func(ref *core.Reference) error {
-		if ref.Name().Short() == branchName {
+		if ref.Name().Short() == refCommit {
 			hash = ref.Hash()
 		}
 
 		return nil
 	})
 
-	if err != nil {
+	if err == nil && !hash.IsZero() {
 		return hash, err
 	}
 
-	if hash.IsZero() {
-		return hash, fmt.Errorf(`Can't find reference "%s"`, branchName)
+	hash = core.NewHash(refCommit)
+
+	_, err = repository.Commit(hash)
+
+	if err == nil && !hash.IsZero() {
+		return hash, nil
 	}
 
-	return hash, nil
+	return hash, fmt.Errorf(`Can't find reference "%s"`, refCommit)
 }
 
 // retrieveCommitPath fetch all commits between 2 references
