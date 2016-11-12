@@ -74,7 +74,7 @@ Usage:
   gommit [command]
 
 Available Commands:
-  check       Check commit messages
+  check       Check ensure a message follows defined patterns
   version     App version
 
 Flags:
@@ -86,10 +86,117 @@ Use "gommit [command] --help" for more information about a command.
 
 ### check
 
+```bash
+Check ensure a message follows defined patterns
+
+Usage:
+  gommit check [flags]
+  gommit check [command]
+
+Available Commands:
+  commit      Check commit message
+  message     Check message
+  range       Check messages in commit range
+
+Flags:
+  -h, --help   help for check
+
+Global Flags:
+      --config string    (default ".gommit.toml")
+
+Use "gommit check [command] --help" for more information about a command.
+
+
 You need to provide two commit references to run matching for instance :
+```
 
-```gommit check master~2^ master```
+#### check commit
 
-or
+Check one comit from its commit ID, doesn't support short ID currently :
 
-```gommit check dev test```
+```gommit check commit aeb603ba83614fae682337bdce9ee1bad1da6d6e```
+
+#### check message
+
+Check a message, useful for script for instance when you want to use it with git hooks :
+
+```gommit check message "Hello"```
+
+#### check range
+
+Check a commit range, useful if you want to use it with a CI to ensure all commits in branch are following your conventions :
+
+* with relative references : ```gommit check range master~2^ master```
+* with asbolute references : ```gommit check range dev test```
+* with commit ids          : ```gommit check range 7bbb37ade3ff36e362d7e20bf34a1325a15b 09f25db7971c100a8c0cfc2b22ab7f872ff0c18d```
+
+## Practical usage
+
+If your system isn't described here and you find a way to have gommit working on it, please improve this documentation by doing a PR for the next who would like to do the same.
+
+### Git hook
+
+It's possible to use gommit to validate each commit when you are creating them. To do so, you need to use the ```commit-msg``` hook, you can replace default script with this one :
+
+```
+#!/bin/sh
+
+gommit check message "$(cat "$1")";
+```
+
+### Travis
+
+In travis, all history isn't cloned, default depth is 50 commits, you can change it : https://docs.travis-ci.com/user/customizing-the-build#Git-Clone-Depth. So we will fetch the ref of our branch we are forking to be able to analyze all messages in this range.
+
+First, we download the binary from the release page according to the version we want and we add in ```.travis.yml``` :
+
+```yaml
+before_install:
+  - wget -O /tmp/gommit https://github.com/antham/gommit/releases/download/v1.0.0/gommit_linux_386 && chmod 777 /tmp/gommit
+```
+
+We can add a perl script in our repository to analyze the commit range :
+
+```perl
+#!/bin/perl
+
+`git fetch --depth=1 origin master 2>&1 >/dev/null`;
+
+my $head = `git rev-parse HEAD`;
+my $master = `git rev-parse FETCH_HEAD`;
+
+chomp($head);
+chomp($master);
+
+system "gommit check range $master $head";
+
+if ($? > 0) {
+    exit 1;
+}
+```
+
+And finally in ```.travis.yml```, make it crash if an error occured :
+
+```yaml
+script: perl test-branch-commit-messages-in-travis.pl
+```
+
+### CircleCI
+
+In CircleCI, there is an environment variable that describe current branch : ```CIRCLE_BRANCH``` (https://circleci.com/docs/environment-variables/).
+
+First, we download the binary from the release page according to the version we want and we add in ```circle.yml``` :
+
+```yaml
+dependencies:
+  pre:
+    - wget -O gommit https://github.com/antham/gommit/releases/download/v1.0.0/main && chmod 777 gommit
+```
+
+And in ```test``` we can run gommit against master for instance :
+
+```
+test:
+  override:
+    - gommit check range master $CIRCLE_BRANCH
+```
