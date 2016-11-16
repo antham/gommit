@@ -152,7 +152,7 @@ First, we download the binary from the release page according to the version we 
 
 ```yaml
 before_install:
-  - wget -O /tmp/gommit https://github.com/antham/gommit/releases/download/v1.0.0/gommit_linux_386 && chmod 777 /tmp/gommit
+  - wget -O /tmp/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 /tmp/gommit
 ```
 
 We can add a perl script in our repository to analyze the commit range :
@@ -190,7 +190,7 @@ First, we download the binary from the release page according to the version we 
 ```yaml
 dependencies:
   pre:
-    - wget -O gommit https://github.com/antham/gommit/releases/download/v1.0.0/main && chmod 777 gommit
+    - wget -O /home/ubuntu/bin/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 /home/ubuntu/bin/gommit
 ```
 
 And in ```test``` we can run gommit against master for instance :
