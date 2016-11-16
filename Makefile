@@ -18,6 +18,9 @@ gometalinter:
 run-tests:
 	./test.sh
 
+run-quick-tests:
+	go test -v $(shell glide nv)
+
 test-all: gometalinter run-tests
 
 test-package:

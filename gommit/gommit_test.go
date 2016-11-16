@@ -60,7 +60,7 @@ func TestMessageMatchTemplate2(t *testing.T) {
 	assert.True(t, match, "Message must match template")
 }
 
-func TestDontMessageMatchTemplate(t *testing.T) {
+func TestMessageDoesntMatchTemplate(t *testing.T) {
 	msg := "This is a test\n"
 	msg += "=> an added reason\n"
 
@@ -70,14 +70,14 @@ func TestDontMessageMatchTemplate(t *testing.T) {
 	assert.False(t, match, "Message must not match template")
 }
 
-func TestRunMatching(t *testing.T) {
+func TestMatchRangeCommitQuery(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := Query{
+	q := RangeCommitQuery{
 		"test/",
 		"master~2",
 		"master",
@@ -88,20 +88,20 @@ func TestRunMatching(t *testing.T) {
 		},
 	}
 
-	m, err := RunMatching(q)
+	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 0, "Must return no items, match was successful for every commit")
 }
 
-func TestRunMatchingWithAMessageErrorCommit(t *testing.T) {
+func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := Query{
+	q := RangeCommitQuery{
 		"test/",
 		"master~2",
 		"master",
@@ -112,16 +112,16 @@ func TestRunMatchingWithAMessageErrorCommit(t *testing.T) {
 		},
 	}
 
-	m, err := RunMatching(q)
+	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
-	assert.Equal(t, "feat(file2) : new file 2\n\ncreate a new file 2\n", (*m)[0].Message, "Must contains commit message")
+	assert.Equal(t, "feat(file2) : new file 2\n\ncreate a new file 2\n", (*m)[0].Context["message"], "Must contains commit message")
 	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestRunMatchingWithASummaryErrorCommit(t *testing.T) {
+func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/bad-summary-message-commit.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -130,7 +130,7 @@ func TestRunMatchingWithASummaryErrorCommit(t *testing.T) {
 		}
 	}
 
-	q := Query{
+	q := RangeCommitQuery{
 		"test/",
 		"master~1",
 		"master",
@@ -141,16 +141,16 @@ func TestRunMatchingWithASummaryErrorCommit(t *testing.T) {
 		},
 	}
 
-	m, err := RunMatching(q)
+	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
-	assert.Equal(t, "A very long summary commit greater than minimum length 50\n", (*m)[0].Message, "Must contains commit message")
+	assert.Equal(t, "A very long summary commit greater than minimum length 50\n", (*m)[0].Context["message"], "Must contains commit message")
 	assert.NoError(t, (*m)[0].MessageError, "Must not contains error")
 	assert.EqualError(t, (*m)[0].SummaryError, "Commit summary length is greater than 50 characters", "Must contains summary message error")
 }
 
-func TestRunMatchingWithAMessageErrorCommitWithoutMergeCommist(t *testing.T) {
+func TestMacthRangeCommitWithAMessageErrorCommitWithoutMergeCommist(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -159,7 +159,7 @@ func TestRunMatchingWithAMessageErrorCommitWithoutMergeCommist(t *testing.T) {
 		}
 	}
 
-	q := Query{
+	q := RangeCommitQuery{
 		"test/",
 		"master~2",
 		"master",
@@ -170,16 +170,16 @@ func TestRunMatchingWithAMessageErrorCommitWithoutMergeCommist(t *testing.T) {
 		},
 	}
 
-	m, err := RunMatching(q)
+	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
-	assert.Equal(t, "feat(file) : new file 3\n\ncreate a new file 3\n", (*m)[0].Message, "Must contains commit message")
+	assert.Equal(t, "feat(file) : new file 3\n\ncreate a new file 3\n", (*m)[0].Context["message"], "Must contains commit message")
 	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestRunMatchingWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
+func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -188,7 +188,7 @@ func TestRunMatchingWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 		}
 	}
 
-	q := Query{
+	q := RangeCommitQuery{
 		"test/",
 		"master~2",
 		"master",
@@ -199,23 +199,23 @@ func TestRunMatchingWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 		},
 	}
 
-	m, err := RunMatching(q)
+	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 2, "Must return two itesm")
-	assert.Equal(t, "Merge branch 'test'\n", (*m)[0].Message, "Must contains commit message")
+	assert.Equal(t, "Merge branch 'test'\n", (*m)[0].Context["message"], "Must contains commit message")
 	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {
+func TestMatchRangeCommitWithAnInvalidCommitRange(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := Query{
+	q := RangeCommitQuery{
 		"test/",
 		"master",
 		"master~2",
@@ -226,21 +226,21 @@ func TestRunMatchingWithAnInvalidCommitRange(t *testing.T) {
 		},
 	}
 
-	m, err := RunMatching(q)
+	m, err := MatchRangeCommitQuery(q)
 
 	assert.Error(t, err, "Must return an error")
 	assert.EqualError(t, err, `No commits found between "master" and "master~2"`, "Must return an explicit message error")
 	assert.Len(t, *m, 0, "Must return no item")
 }
 
-func TestRunMatchingWithAnUnexistingCommitRange(t *testing.T) {
+func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := Query{
+	q := RangeCommitQuery{
 		"test/",
 		"master~15",
 		"master",
@@ -251,10 +251,147 @@ func TestRunMatchingWithAnUnexistingCommitRange(t *testing.T) {
 		},
 	}
 
-	m, err := RunMatching(q)
+	m, err := MatchRangeCommitQuery(q)
 
 	assert.EqualError(t, err, "Can't find reference", "Must return an error")
 	assert.Len(t, *m, 0, "Must return no item")
+}
+
+func TestMatchMessageQuery(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := MessageQuery{
+		"update(file) : fix",
+		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		map[string]bool{
+			"check-summary-length":  false,
+			"exclude-merge-commits": false,
+		},
+	}
+
+	m, err := MatchMessageQuery(q)
+
+	assert.NoError(t, err, "Must return no error")
+	assert.Equal(t, Matching{}, *m, "Must return an empty matching struct")
+}
+
+func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := MessageQuery{
+		"update(file) :",
+		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		map[string]bool{
+			"check-summary-length":  false,
+			"exclude-merge-commits": false,
+		},
+	}
+
+	m, err := MatchMessageQuery(q)
+
+	assert.NoError(t, err, "Must return no error")
+	assert.EqualError(t, m.MessageError, "No template match commit message", "Must return a template message error")
+	assert.NoError(t, m.SummaryError, "Must return no summary error")
+	assert.Equal(t, "update(file) :", m.Context["message"], "Must contains original message")
+}
+
+func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := MessageQuery{
+		"update(file) : test test test test test test test test test test test test test test",
+		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		map[string]bool{
+			"check-summary-length":  true,
+			"exclude-merge-commits": false,
+		},
+	}
+
+	m, err := MatchMessageQuery(q)
+
+	assert.NoError(t, err, "Must return no error")
+	assert.NoError(t, m.MessageError, "Must return no template message error")
+	assert.EqualError(t, m.SummaryError, "Commit summary length is greater than 50 characters", "Must return a template message error")
+	assert.Equal(t, "update(file) : test test test test test test test test test test test test test test", m.Context["message"], "Must contains original message")
+}
+
+func TestMatchCommitQuery(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = "test"
+
+	ID, err := cmd.Output()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := CommitQuery{
+		"test/",
+		string(ID[:len(ID)-1]),
+		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		map[string]bool{
+			"check-summary-length":  true,
+			"exclude-merge-commits": false,
+		},
+	}
+
+	m, err := MatchCommitQuery(q)
+
+	assert.NoError(t, err, "Must return no error")
+	assert.Equal(t, Matching{}, *m, "Must return an empty matching struct")
+}
+
+func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = "test"
+
+	ID, err := cmd.Output()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := CommitQuery{
+		"test/",
+		string(ID[:len(ID)-1]),
+		map[string]string{"simple": "whatever"},
+		map[string]bool{
+			"check-summary-length":  true,
+			"exclude-merge-commits": false,
+		},
+	}
+
+	m, err := MatchCommitQuery(q)
+
+	assert.NoError(t, err, "Must return no error")
+	assert.Equal(t, "update(file1) : update file 1\n\nupdate file 1 with a text\n", m.Context["message"], "Must contains commit message")
+	assert.Equal(t, string(ID[:len(ID)-1]), m.Context["ID"], "Must contains commit id")
+	assert.EqualError(t, m.MessageError, "No template match commit message", "Must contains commit message error")
+	assert.NoError(t, m.SummaryError, "Must not contains error")
 }
 
 func TestIsValidSummaryLengthWithCorrectSize(t *testing.T) {

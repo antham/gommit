@@ -21,29 +21,33 @@ var info = func(message string) {
 	color.Cyan(message)
 }
 
-var renderErrors = func(errors *[]gommit.CommitError) {
-	for _, e := range *errors {
+var renderMatchings = func(matchings *[]*gommit.Matching) {
+	for _, m := range *matchings {
 		color.White("----")
 		fmt.Println()
 
-		fmt.Printf("%s%s\n", color.YellowString("Id       : "), color.WhiteString("%s", e.ID))
+		if ID, ok := m.Context["ID"]; ok {
+			fmt.Printf("%s%s\n", color.YellowString("Id       : "), color.WhiteString("%s", ID))
+		}
 
-		color.Yellow("Message  : ")
+		if message, ok := m.Context["message"]; ok {
+			color.Yellow("Message  : ")
 
-		for _, field := range strings.Split(e.Message, "\n") {
-			fmt.Printf("%s%s\n", color.YellowString("           "), color.WhiteString("%s", field))
+			for _, field := range strings.Split(message, "\n") {
+				fmt.Printf("%s%s\n", color.YellowString("           "), color.WhiteString("%s", field))
+			}
 		}
 
 		fmt.Println()
 
 		errs := []error{}
 
-		if e.MessageError != nil {
-			errs = append(errs, e.MessageError)
+		if m.MessageError != nil {
+			errs = append(errs, m.MessageError)
 		}
 
-		if e.SummaryError != nil {
-			errs = append(errs, e.SummaryError)
+		if m.SummaryError != nil {
+			errs = append(errs, m.SummaryError)
 		}
 
 		for i, e := range errs {
@@ -63,7 +67,7 @@ var renderExamples = func(examples map[string]string) {
 	color.White("=======")
 	fmt.Println()
 
-	color.White("Your message commits must match one of those following patterns :")
+	color.White("Your message must match one of those following patterns :")
 
 	fmt.Println()
 

@@ -13,7 +13,7 @@ import (
 	"github.com/antham/gommit/gommit"
 )
 
-func TestCheckWithErrors(t *testing.T) {
+func TestCheckRangeCommitWithErrors(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
@@ -43,13 +43,16 @@ func TestCheckWithErrors(t *testing.T) {
 	arguments := [][]string{
 		[]string{
 			"check",
+			"range",
 		},
 		[]string{
 			"check",
+			"range",
 			"master~2",
 		},
 		[]string{
 			"check",
+			"range",
 			"master~1",
 			"master~2",
 			"test",
@@ -57,32 +60,37 @@ func TestCheckWithErrors(t *testing.T) {
 		},
 		[]string{
 			"check",
+			"range",
 			"master~1",
 			"master~2",
 			"whatever",
 		},
 		[]string{
 			"check",
+			"range",
 			"master~1",
 			"master~2",
 			"check.go",
 		},
 		[]string{
 			"check",
+			"range",
 			"whatever",
 			"master",
 			"test/",
 		},
 		[]string{
 			"check",
-			"master~1",
+			"range",
 			"master~2",
+			"master~1",
 			"test/",
 		},
 		[]string{
 			"check",
-			"master~1",
+			"range",
 			"master~2",
+			"master~1",
 			"test/",
 		},
 	}
@@ -125,6 +133,7 @@ func TestCheckWithErrors(t *testing.T) {
 
 			os.Args = []string{"", "--config", configs[i]}
 			os.Args = append(os.Args, a...)
+
 			_ = RootCmd.Execute()
 		}()
 
@@ -135,7 +144,7 @@ func TestCheckWithErrors(t *testing.T) {
 	}
 }
 
-func TestCheckCommitsWithBadCommitMessage(t *testing.T) {
+func TestCheckRangeCommitWithBadCommitMessage(t *testing.T) {
 	path, err := os.Getwd()
 
 	if err != nil {
@@ -161,11 +170,11 @@ func TestCheckCommitsWithBadCommitMessage(t *testing.T) {
 
 	var w sync.WaitGroup
 
-	var errors *[]gommit.CommitError
+	var matchings *[]*gommit.Matching
 	var examples map[string]string
 
-	renderErrors = func(e *[]gommit.CommitError) {
-		errors = e
+	renderMatchings = func(m *[]*gommit.Matching) {
+		matchings = m
 	}
 
 	renderExamples = func(e map[string]string) {
@@ -177,26 +186,25 @@ func TestCheckCommitsWithBadCommitMessage(t *testing.T) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil && r.(int) == 0 {
-				e := []gommit.CommitError{}
-				errors = &e
+				matchings = &[]*gommit.Matching{}
 				examples = map[string]string{}
 			}
 
 			w.Done()
 		}()
 
-		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "master~3", "master", path + "/test"}
+		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "range", "master~3", "master", path + "/test"}
 
 		Execute()
 	}()
 
 	w.Wait()
 
-	assert.Len(t, *errors, 1, "Must return 1 commits")
+	assert.Len(t, *matchings, 1, "Must return 1 commits")
 	assert.Len(t, examples, 3, "Must return 3 examples")
 }
 
-func TestCheckCommitsWithNoErrors(t *testing.T) {
+func TestCheckRangeCommitWithNoErrors(t *testing.T) {
 	path, err := os.Getwd()
 
 	if err != nil {
@@ -239,7 +247,7 @@ func TestCheckCommitsWithNoErrors(t *testing.T) {
 			w.Done()
 		}()
 
-		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "master~2", "master", path + "/test"}
+		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "range", "master~2", "master", path + "/test"}
 
 		Execute()
 	}()
