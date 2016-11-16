@@ -6,7 +6,7 @@ go:
   - 1.7
 
 before_install:
-  - wget -O /tmp/gommit https://github.com/antham/gommit/releases/download/v1.0.0/gommit_linux_386 && chmod 777 /tmp/gommit
+  - wget -O /tmp/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 /tmp/gommit
   - export PATH=$PATH:/tmp/
   - go get github.com/onsi/gomega
   - go get github.com/onsi/ginkgo
