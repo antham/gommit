@@ -8,5 +8,4 @@ import:
   - assert
 - package: github.com/fatih/color
   version: ^1.0.0
-- package: gopkg.in/src-d/go-git.v4
-  version: ^4.0.0-rc1
+- package: srcd.works/go-git.v4

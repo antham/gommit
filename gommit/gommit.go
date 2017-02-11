@@ -5,7 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"gopkg.in/src-d/go-git.v4"
+	"srcd.works/go-git.v4"
+	"srcd.works/go-git.v4/plumbing/object"
 
 	"github.com/antham/gommit/reference"
 )
@@ -45,8 +46,8 @@ type MessageQuery struct {
 const maxSummarySize = 50
 
 // fetchCommits retrieves all commits in repository between 2 commits references
-func fetchCommits(repoPath string, from string, to string) (*[]*git.Commit, error) {
-	repo, err := git.NewFilesystemRepository(repoPath + "/.git/")
+func fetchCommits(repoPath string, from string, to string) (*[]*object.Commit, error) {
+	repo, err := git.PlainOpen(repoPath)
 
 	if err != nil {
 		return nil, err
@@ -56,8 +57,8 @@ func fetchCommits(repoPath string, from string, to string) (*[]*git.Commit, erro
 }
 
 // fetchCommit retrieve a single commit in repository from its ID
-func fetchCommit(repoPath string, ID string) (*git.Commit, error) {
-	repo, err := git.NewFilesystemRepository(repoPath + "/.git/")
+func fetchCommit(repoPath string, ID string) (*object.Commit, error) {
+	repo, err := git.PlainOpen(repoPath)
 
 	if err != nil {
 		return nil, err
@@ -83,7 +84,7 @@ func isValidSummaryLength(message string) bool {
 }
 
 // isMergeCommit return true if a commit is a merge commit
-func isMergeCommit(commit *git.Commit) bool {
+func isMergeCommit(commit *object.Commit) bool {
 	return commit.NumParents() == 2
 }
 
@@ -124,7 +125,7 @@ func analyzeMessage(message string, matchers map[string]string, options map[stri
 }
 
 // analyzeCommit check if a commit match
-func analyzeCommit(commit *git.Commit, matchers map[string]string, options map[string]bool) *Matching {
+func analyzeCommit(commit *object.Commit, matchers map[string]string, options map[string]bool) *Matching {
 	if options["exclude-merge-commits"] && isMergeCommit(commit) {
 		return &Matching{}
 	}
@@ -141,7 +142,7 @@ func analyzeCommit(commit *git.Commit, matchers map[string]string, options map[s
 }
 
 // analyzeCommits check if a slice of commits match
-func analyzeCommits(commits *[]*git.Commit, matchers map[string]string, options map[string]bool) *[]*Matching {
+func analyzeCommits(commits *[]*object.Commit, matchers map[string]string, options map[string]bool) *[]*Matching {
 	matchings := []*Matching{}
 
 	for _, commit := range *commits {

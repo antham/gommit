@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/core"
+	"srcd.works/go-git.v4"
+	"srcd.works/go-git.v4/plumbing"
+	"srcd.works/go-git.v4/plumbing/object"
 )
 
 // refSolver match a SymbolicRefPathStmt against
 // a repository to resolve commit refSolver and commit reference
 type refSolver struct {
 	stmt      *symbolicRefPathStmt
-	commitRef *git.Commit
+	commitRef *object.Commit
 }
 
 // newRefSolver creates a new RefSolver object
@@ -51,8 +52,8 @@ func newRefSolver(stmt *symbolicRefPathStmt, repo *git.Repository) (*refSolver, 
 }
 
 // resolveHash give hash commit for a given string reference
-func resolveHash(refCommit string, repository *git.Repository) (core.Hash, error) {
-	hash := core.Hash{}
+func resolveHash(refCommit string, repository *git.Repository) (plumbing.Hash, error) {
+	hash := plumbing.Hash{}
 
 	if strings.ToLower(refCommit) == "head" {
 		head, err := repository.Head()
@@ -62,13 +63,13 @@ func resolveHash(refCommit string, repository *git.Repository) (core.Hash, error
 		}
 	}
 
-	iter, err := repository.Refs()
+	iter, err := repository.References()
 
 	if err != nil {
-		return core.Hash{}, err
+		return plumbing.Hash{}, err
 	}
 
-	err = iter.ForEach(func(ref *core.Reference) error {
+	err = iter.ForEach(func(ref *plumbing.Reference) error {
 		if ref.Name().Short() == refCommit {
 			hash = ref.Hash()
 		}
@@ -80,7 +81,7 @@ func resolveHash(refCommit string, repository *git.Repository) (core.Hash, error
 		return hash, err
 	}
 
-	hash = core.NewHash(refCommit)
+	hash = plumbing.NewHash(refCommit)
 
 	_, err = repository.Commit(hash)
 
@@ -92,14 +93,13 @@ func resolveHash(refCommit string, repository *git.Repository) (core.Hash, error
 }
 
 // retrieveCommitPath fetch all commits between 2 references
-func retrieveCommitPath(from *git.Commit, to *git.Commit) (*[]*git.Commit, error) {
-	results := []*git.Commit{}
-	parents := []*git.Commit{}
-
+func retrieveCommitPath(from *object.Commit, to *object.Commit) (*[]*object.Commit, error) {
+	results := []*object.Commit{}
+	parents := []*object.Commit{}
+	fmt.Println(to)
 	err := to.Parents().ForEach(
-		func(c *git.Commit) error {
+		func(c *object.Commit) error {
 			parents = append(parents, c)
-
 			return nil
 		})
 
@@ -132,8 +132,8 @@ func retrieveCommitPath(from *git.Commit, to *git.Commit) (*[]*git.Commit, error
 }
 
 // parseCommitHistory return commits between two intervals
-func parseCommitHistory(from *refSolver, to *refSolver) (*[]*git.Commit, error) {
-	results := []*git.Commit{}
+func parseCommitHistory(from *refSolver, to *refSolver) (*[]*object.Commit, error) {
+	results := []*object.Commit{}
 
 	commits, err := retrieveCommitPath(from.commitRef, to.commitRef)
 
@@ -155,8 +155,8 @@ func parseCommitHistory(from *refSolver, to *refSolver) (*[]*git.Commit, error) 
 }
 
 // parseTree recursively parse a given tree to extract commits till boundary is reached
-func parseTree(commit *git.Commit, bound *git.Commit) ([]*git.Commit, []error) {
-	commits := []*git.Commit{}
+func parseTree(commit *object.Commit, bound *object.Commit) ([]*object.Commit, []error) {
+	commits := []*object.Commit{}
 	errors := []error{}
 
 	if commit.ID() == bound.ID() || commit.NumParents() == 0 {
@@ -165,10 +165,10 @@ func parseTree(commit *git.Commit, bound *git.Commit) ([]*git.Commit, []error) {
 
 	commits = append(commits, commit)
 
-	parents := []*git.Commit{}
+	parents := []*object.Commit{}
 
 	err := commit.Parents().ForEach(
-		func(c *git.Commit) error {
+		func(c *object.Commit) error {
 			parents = append(parents, c)
 
 			return nil
@@ -195,39 +195,40 @@ func parseTree(commit *git.Commit, bound *git.Commit) ([]*git.Commit, []error) {
 }
 
 // FetchCommitInterval retrieves commit refSolver in a given interval for a repository
-func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*git.Commit, error) {
+func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*object.Commit, error) {
 	refRefSolverFrom := newParser(bytes.NewBufferString(from))
 	fromStmt, err := refRefSolverFrom.parseSymbolicReferencePath()
+	commits := []*object.Commit{}
 
 	if err != nil {
-		return &[]*git.Commit{}, err
+		return &commits, err
 	}
 
 	refRefSolverTo := newParser(bytes.NewBufferString(to))
 	toStmt, err := refRefSolverTo.parseSymbolicReferencePath()
 
 	if err != nil {
-		return &[]*git.Commit{}, err
+		return &commits, err
 	}
 
 	fromRefSolver, err := newRefSolver(fromStmt, repo)
 
 	if err != nil {
-		return &[]*git.Commit{}, err
+		return &commits, err
 	}
 
 	toRefSolver, err := newRefSolver(toStmt, repo)
 
 	if err != nil {
-		return &[]*git.Commit{}, err
+		return &commits, err
 	}
 
 	return parseCommitHistory(fromRefSolver, toRefSolver)
 }
 
 // FetchCommitByID retrieves a single commit from a repository
-func FetchCommitByID(repo *git.Repository, ID string) (*git.Commit, error) {
-	hash := core.NewHash(ID)
+func FetchCommitByID(repo *git.Repository, ID string) (*object.Commit, error) {
+	hash := plumbing.NewHash(ID)
 
 	return repo.Commit(hash)
 }
