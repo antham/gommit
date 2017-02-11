@@ -5,6 +5,13 @@ Gommit analyze commits messages to ensure they follow defined pattern.
 
 [![asciicast](https://asciinema.org/a/0j12qm7yay1kku7o3vrs67pv2.png)](https://asciinema.org/a/0j12qm7yay1kku7o3vrs67pv2)
 
+## Summary
+
+* [Setup](#setup)
+* [Usage](#usage)
+* [Practical Usage](#practical-usage)
+* [Third Part Libraries](#third-part-libraries)
+
 ## Setup
 
 Download from release page according to your architecture gommit binary : https://github.com/antham/gommit/releases
@@ -213,8 +220,8 @@ test:
     - gommit check range master $CIRCLE_BRANCH
 ```
 
-### Third part libraries
+## Third Part Libraries
 
-####Nodejs
+### Nodejs
 
 [gommitjs](https://github.com/dschnare/gommitjs) => A Nodejs wrapper for gommit
