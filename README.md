@@ -155,20 +155,32 @@ before_install:
   - wget -O /tmp/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 /tmp/gommit
 ```
 
-We can add a perl script in our repository to analyze the commit range :
+We can add a perl script in our repository to analyze the commit range, our main branch is master here:
 
 ```perl
 #!/bin/perl
 
-`git fetch --depth=1 origin master 2>&1 >/dev/null`;
+my $branch = '';
 
-my $head = `git rev-parse HEAD`;
-my $master = `git rev-parse FETCH_HEAD`;
+if ($ENV{'TRAVIS_PULL_REQUEST'} eq 'false') {
+    $branch = `$ENV{TRAVIS_BRANCH}`;
+} else {
+    $branch = `$ENV{TRAVIS_PULL_REQUEST_BRANCH}`;
+}
 
-chomp($head);
-chomp($master);
+if ($branch eq 'master') {
+    exit 0;
+}
 
-system "gommit check range $master $head";
+`git ls-remote origin master` =~ /([a-f0-9]{40})/;
+
+my $refHead = `git rev-parse HEAD`;
+my $refTail = $1;
+
+chomp($refHead);
+chomp($refTail);
+
+system "gommit check range $refTail $refHead";
 
 if ($? > 0) {
     exit 1;
