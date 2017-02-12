@@ -48,7 +48,7 @@ an_extended_commit="""
 
 #### Matchers
 
-You can define as many matchers you want, naming is up to you, they will all be run against a commit message till one match.
+You can define as many matchers you want, naming is up to you, they will all be compared against a commit message till one match.
 
 #### Examples
 
@@ -133,9 +133,9 @@ Check a message, useful for script for instance when you want to use it with git
 
 Check a commit range, useful if you want to use it with a CI to ensure all commits in branch are following your conventions :
 
-* with relative references : ```gommit check range master~2^ master```
-* with asbolute references : ```gommit check range dev test```
-* with commit ids          : ```gommit check range 7bbb37ade3ff36e362d7e20bf34a1325a15b 09f25db7971c100a8c0cfc2b22ab7f872ff0c18d```
+* with relative references                             : ```gommit check range master~2^ master```
+* with absolute references                             : ```gommit check range dev test```
+* with commit ids (doesn't support short ID currently) : ```gommit check range 7bbb37ade3ff36e362d7e20bf34a1325a15b 09f25db7971c100a8c0cfc2b22ab7f872ff0c18d```
 
 ## Practical usage
 
@@ -162,7 +162,7 @@ before_install:
   - wget -O /tmp/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 /tmp/gommit
 ```
 
-We can add a perl script in our repository to analyze the commit range, our main branch is master here:
+We can add a perl script in our repository to analyze the commit range against master for instance (master reference needs to be part of cloned history):
 
 ```perl
 #!/bin/perl
@@ -194,7 +194,7 @@ if ($? > 0) {
 }
 ```
 
-And finally in ```.travis.yml```, make it crash if an error occured :
+And finally in ```.travis.yml```, make it crashs when an error occured :
 
 ```yaml
 script: perl test-branch-commit-messages-in-travis.pl
@@ -224,4 +224,4 @@ test:
 
 ### Nodejs
 
-[gommitjs](https://github.com/dschnare/gommitjs) => A Nodejs wrapper for gommit
+* [gommitjs](https://github.com/dschnare/gommitjs) : A Nodejs wrapper for gommit
