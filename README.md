@@ -153,7 +153,7 @@ gommit check message "$(cat "$1")";
 
 ### Travis
 
-In travis, all history isn't cloned, default depth is 50 commits, you can change it : https://docs.travis-ci.com/user/customizing-the-build#Git-Clone-Depth. So we will fetch the ref of our branch we are forking to be able to analyze all messages in this range.
+In travis, all history isn't cloned, default depth is 50 commits, you can change it : https://docs.travis-ci.com/user/customizing-the-build#Git-Clone-Depth.
 
 First, we download the binary from the release page according to the version we want and we add in ```.travis.yml``` :
 
