@@ -1,18 +1,26 @@
 #!/bin/perl
 
-if ($ENV{'TRAVIS_PULL_REQUEST'} == 'false') {
+my $branch = '';
+
+if ($ENV{'TRAVIS_PULL_REQUEST'} eq 'false') {
+    $branch = `$ENV{TRAVIS_BRANCH}`;
+} else {
+    $branch = `$ENV{TRAVIS_PULL_REQUEST_BRANCH}`;
+}
+
+if ($branch eq 'master') {
     exit 0;
 }
 
-`git fetch --depth=1 origin master 2>&1 >/dev/null`;
+`git ls-remote origin master` =~ /([a-f0-9]{40})/;
 
-my $head = `git rev-parse HEAD`;
-my $master = `git rev-parse FETCH_HEAD`;
+my $refHead = `git rev-parse HEAD`;
+my $refTail = $1;
 
-chomp($head);
-chomp($master);
+chomp($refHead);
+chomp($refTail);
 
-system "gommit check range $master $head";
+system "gommit check range $refTail $refHead";
 
 if ($? > 0) {
     exit 1;

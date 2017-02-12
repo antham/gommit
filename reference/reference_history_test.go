@@ -7,11 +7,12 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/src-d/go-git.v4"
+	"srcd.works/go-git.v4"
+	"srcd.works/go-git.v4/plumbing/object"
 )
 
 // Result correctness is checked against git log
-func fetchCommitFromAGivenInterval(from string, to string) ([]*git.Commit, error) {
+func fetchCommitFromAGivenInterval(from string, to string) ([]*object.Commit, error) {
 	for _, filename := range []string{"../features/repo.sh", "../features/merge-commits.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -26,7 +27,7 @@ func fetchCommitFromAGivenInterval(from string, to string) ([]*git.Commit, error
 		logrus.Fatal(err)
 	}
 
-	repo, err := git.NewFilesystemRepository(path + "/test/.git/")
+	repo, err := git.PlainOpen(path + "/test")
 
 	if err != nil {
 		logrus.Fatal(err)
@@ -298,7 +299,7 @@ func TestFetchCommitIntervalWithUnexistingRange(t *testing.T) {
 	commits, err := fetchCommitFromAGivenInterval("master~25", "master~30")
 
 	assert.EqualError(t, err, "Can't find reference", "Must return an error, interval doesn't exist")
-	assert.Equal(t, []*git.Commit{}, commits, "Must contains no datas")
+	assert.Equal(t, []*object.Commit{}, commits, "Must contains no datas")
 }
 
 func TestFetchCommitByID(t *testing.T) {
@@ -314,7 +315,7 @@ func TestFetchCommitByID(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	repo, err := git.NewFilesystemRepository(path + "/test/.git/")
+	repo, err := git.PlainOpen(path + "/test")
 
 	if err != nil {
 		logrus.Fatal(err)
@@ -348,7 +349,7 @@ func TestFetchCommitByIDWithAWrongCommitID(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	repo, err := git.NewFilesystemRepository(path + "/test/.git/")
+	repo, err := git.PlainOpen(path + "/test")
 
 	if err != nil {
 		logrus.Fatal(err)
