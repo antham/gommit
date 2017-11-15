@@ -62,7 +62,7 @@ func validateFileConfig() error {
 		_, err := regexp.Compile(matcher)
 
 		if err != nil {
-			return fmt.Errorf(`Regexp "%s" is not a valid regexp, please check the syntax`, name)
+			return fmt.Errorf(`Regexp "%s" identified by "%s" is not a valid regexp, please check the syntax`, matcher, name)
 		}
 	}
 

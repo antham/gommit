@@ -74,6 +74,12 @@ func TestCheckCommitWithErrors(t *testing.T) {
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"test",
 		},
+		[]string{
+			"check",
+			"commit",
+			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
+			"test",
+		},
 	}
 
 	errors := []error{
@@ -83,6 +89,7 @@ func TestCheckCommitWithErrors(t *testing.T) {
 		fmt.Errorf(`object not found`),
 		fmt.Errorf(`At least one matcher must be defined`),
 		fmt.Errorf(`At least one example must be defined`),
+		fmt.Errorf(`Regexp "**" identified by "all" is not a valid regexp, please check the syntax`),
 	}
 
 	configs := []string{
@@ -92,6 +99,7 @@ func TestCheckCommitWithErrors(t *testing.T) {
 		path + "/../features/.gommit.toml",
 		path + "/../features/.gommit-no-matchers.toml",
 		path + "/../features/.gommit-no-examples.toml",
+		path + "/../features/.gommit-wrong-regexp.toml",
 	}
 
 	for i, a := range arguments {
