@@ -7,8 +7,8 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"srcd.works/go-git.v4"
-	"srcd.works/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
 // Result correctness is checked against git log
@@ -27,7 +27,7 @@ func fetchCommitFromAGivenInterval(from string, to string) ([]*object.Commit, er
 		logrus.Fatal(err)
 	}
 
-	repo, err := git.PlainOpen(path + "/test")
+	repo, err := git.NewFilesystemRepository(path + "/test/.git")
 
 	if err != nil {
 		logrus.Fatal(err)
@@ -315,7 +315,7 @@ func TestFetchCommitByID(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	repo, err := git.PlainOpen(path + "/test")
+	repo, err := git.NewFilesystemRepository(path + "/test/.git")
 
 	if err != nil {
 		logrus.Fatal(err)
@@ -349,7 +349,7 @@ func TestFetchCommitByIDWithAWrongCommitID(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	repo, err := git.PlainOpen(path + "/test")
+	repo, err := git.NewFilesystemRepository(path + "/test/.git")
 
 	if err != nil {
 		logrus.Fatal(err)
