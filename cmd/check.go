@@ -26,7 +26,11 @@ var checkCmd = &cobra.Command{
 }
 
 func parseDirectory(path string) (string, error) {
-	if path != "" {
+	if path == "" {
+		if _, err := os.Getwd(); err != nil {
+			return "", err
+		}
+	} else {
 		f, err := os.Stat(path)
 
 		if err != nil {
@@ -35,14 +39,6 @@ func parseDirectory(path string) (string, error) {
 
 		if !f.IsDir() {
 			return "", fmt.Errorf(`"%s" must be a directory`, path)
-		}
-	} else {
-		var err error
-
-		path, err = os.Getwd()
-
-		if err != nil {
-			return path, err
 		}
 	}
 
@@ -62,7 +58,7 @@ func validateFileConfig() error {
 		_, err := regexp.Compile(matcher)
 
 		if err != nil {
-			return fmt.Errorf(`Regexp "%s" is not a valid regexp, please check the syntax`, name)
+			return fmt.Errorf(`Regexp "%s" identified by "%s" is not a valid regexp, please check the syntax`, matcher, name)
 		}
 	}
 

@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"srcd.works/go-git.v4"
-	"srcd.works/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
 	"github.com/antham/gommit/reference"
 )
@@ -47,7 +47,7 @@ const maxSummarySize = 50
 
 // fetchCommits retrieves all commits in repository between 2 commits references
 func fetchCommits(repoPath string, from string, to string) (*[]*object.Commit, error) {
-	repo, err := git.PlainOpen(repoPath)
+	repo, err := git.NewFilesystemRepository(repoPath + "/.git")
 
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func fetchCommits(repoPath string, from string, to string) (*[]*object.Commit, e
 
 // fetchCommit retrieve a single commit in repository from its ID
 func fetchCommit(repoPath string, ID string) (*object.Commit, error) {
-	repo, err := git.PlainOpen(repoPath)
+	repo, err := git.NewFilesystemRepository(repoPath + "/.git")
 
 	if err != nil {
 		return nil, err
