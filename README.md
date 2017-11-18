@@ -48,7 +48,7 @@ an_extended_commit="""
 
 #### Matchers
 
-You can define as many matchers you want, naming is up to you, they will all be compared against a commit message till one match.
+You can define as many matchers you want using regexp, naming is up to you, they will all be compared against a commit message till one match. Regexps used support comments, possessive match, positive lookahead, negative lookahead, positive lookbehind, negative lookbehind, back reference, named back referenc and conditionals.
 
 #### Examples
 

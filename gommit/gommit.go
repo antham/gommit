@@ -2,11 +2,11 @@ package gommit
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"github.com/dlclark/regexp2"
 
 	"github.com/antham/gommit/reference"
 )
@@ -69,11 +69,11 @@ func fetchCommit(repoPath string, ID string) (*object.Commit, error) {
 
 // messageMatchTemplate try to match a commit message against a regexp
 func messageMatchTemplate(message string, template string) bool {
-	r := regexp.MustCompile(template)
+	r := regexp2.MustCompile(template, 0)
 
-	g := r.FindStringSubmatch(message)
+	b, err := r.MatchString(message)
 
-	return len(g) > 0 && g[0] == message
+	return err == nil && b
 }
 
 // isValidSummaryLength return true if size length is lower than 80 characters

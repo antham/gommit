@@ -3,7 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"regexp"
+
+	"github.com/dlclark/regexp2"
 
 	"github.com/antham/gommit/gommit"
 	"github.com/spf13/cobra"
@@ -55,7 +56,7 @@ func validateFileConfig() error {
 	}
 
 	for name, matcher := range viper.GetStringMapString("matchers") {
-		_, err := regexp.Compile(matcher)
+		_, err := regexp2.Compile(matcher, 0)
 
 		if err != nil {
 			return fmt.Errorf(`Regexp "%s" identified by "%s" is not a valid regexp, please check the syntax`, matcher, name)
