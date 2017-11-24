@@ -85,6 +85,13 @@ func processMatchResult(matchings *[]*gommit.Matching, err error, examples map[s
 	exitSuccess()
 }
 
+func buildOptions() gommit.Options {
+	return gommit.Options{
+		viper.GetBool("config.check-summary-length"),
+		viper.GetBool("config.exclude-merge-commits"),
+	}
+}
+
 func init() {
 	RootCmd.AddCommand(checkCmd)
 }

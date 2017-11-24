@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dlclark/regexp2"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
-	"github.com/dlclark/regexp2"
 
 	"github.com/antham/gommit/reference"
 )
@@ -23,7 +23,7 @@ type CommitQuery struct {
 	Path     string
 	ID       string
 	Matchers map[string]string
-	Options  map[string]bool
+	Options  Options
 }
 
 // RangeCommitQuery to retrieves commits and do checking
@@ -32,14 +32,20 @@ type RangeCommitQuery struct {
 	From     string
 	To       string
 	Matchers map[string]string
-	Options  map[string]bool
+	Options  Options
 }
 
 // MessageQuery to check only commit message
 type MessageQuery struct {
 	Message  string
 	Matchers map[string]string
-	Options  map[string]bool
+	Options  Options
+}
+
+// Options represents options picked from configuration
+type Options struct {
+	CheckSummaryLength  bool
+	ExcludeMergeCommits bool
 }
 
 // maxSummarySize represents the maximum length allowed for the message commit summary
@@ -95,7 +101,7 @@ func IsZeroMatching(matching *Matching) bool {
 }
 
 // analyzeMessage checks if a message match expectations
-func analyzeMessage(message string, matchers map[string]string, options map[string]bool) *Matching {
+func analyzeMessage(message string, matchers map[string]string, options Options) *Matching {
 	matching := Matching{}
 	matchTemplate := false
 	hasError := false
@@ -108,7 +114,7 @@ func analyzeMessage(message string, matchers map[string]string, options map[stri
 		}
 	}
 
-	if options["check-summary-length"] && !isValidSummaryLength(message) {
+	if options.CheckSummaryLength && !isValidSummaryLength(message) {
 		hasError = true
 		matching.SummaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
 	}
@@ -126,8 +132,8 @@ func analyzeMessage(message string, matchers map[string]string, options map[stri
 }
 
 // analyzeCommit checks if a commit message match expectations
-func analyzeCommit(commit *object.Commit, matchers map[string]string, options map[string]bool) *Matching {
-	if options["exclude-merge-commits"] && isMergeCommit(commit) {
+func analyzeCommit(commit *object.Commit, matchers map[string]string, options Options) *Matching {
+	if options.ExcludeMergeCommits && isMergeCommit(commit) {
 		return &Matching{}
 	}
 
@@ -143,7 +149,7 @@ func analyzeCommit(commit *object.Commit, matchers map[string]string, options ma
 }
 
 // analyzeCommits checks if a slice of commits message match expectations
-func analyzeCommits(commits *[]*object.Commit, matchers map[string]string, options map[string]bool) *[]*Matching {
+func analyzeCommits(commits *[]*object.Commit, matchers map[string]string, options Options) *[]*Matching {
 	matchings := []*Matching{}
 
 	for _, commit := range *commits {

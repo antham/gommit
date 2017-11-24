@@ -82,9 +82,9 @@ func TestMatchRangeCommitQuery(t *testing.T) {
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -106,9 +106,9 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -135,9 +135,9 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 		"master~1",
 		"master",
 		map[string]string{"simple": ".*\n"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -164,9 +164,9 @@ func TestMacthRangeCommitWithAMessageErrorCommitWithoutMergeCommist(t *testing.T
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": true,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: true,
 		},
 	}
 
@@ -193,9 +193,9 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -220,9 +220,9 @@ func TestMatchRangeCommitWithAnInvalidCommitRange(t *testing.T) {
 		"master",
 		"master~2",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -245,9 +245,9 @@ func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
 		"master~15",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -267,9 +267,9 @@ func TestMatchMessageQuery(t *testing.T) {
 	q := MessageQuery{
 		"update(file) : fix",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -289,9 +289,9 @@ func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 	q := MessageQuery{
 		"update(file) :",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -313,9 +313,9 @@ func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 	q := MessageQuery{
 		"update(file) : test test test test test test test test test test test test test test",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -347,9 +347,9 @@ func TestMatchCommitQuery(t *testing.T) {
 		"test/",
 		string(ID[:len(ID)-1]),
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -379,9 +379,9 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 		"test/",
 		string(ID[:len(ID)-1]),
 		map[string]string{"simple": "whatever"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
 		},
 	}
 
