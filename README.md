@@ -194,22 +194,25 @@ script: perl test-branch-commit-messages-in-travis.pl
 
 ### CircleCI
 
-In CircleCI, there is an environment variable that describe current branch : ```CIRCLE_BRANCH``` (https://circleci.com/docs/environment-variables/).
+In CircleCI (2.0), there is an environment variable that describe current branch : ```CIRCLE_BRANCH``` (https://circleci.com/docs/2.0/env-vars/#circleci-environment-variable-descriptions).
 
-First, we download the binary from the release page according to the version we want and we add in ```circle.yml``` :
+First, we download the binary from the release page according to the version we want and we add in ```.circleci/config.yml``` :
 
 ```yaml
-dependencies:
-  pre:
-    - wget -O /home/ubuntu/bin/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 /home/ubuntu/bin/gommit
+- run:
+    name: Get gommit binary
+    command: |
+      mkdir /home/circleci/bin
+      wget -O ~/bin/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 ~/bin/gommit
 ```
 
-And in ```test``` we can run gommit against master for instance :
+And we can run gommit against master for instance :
 
 ```
-test:
-  override:
-    - gommit check range master $CIRCLE_BRANCH
+- run:
+    name: Run gommit
+    command: |
+      ~/bin/gommit check range $(git rev-parse origin/master) $(git rev-parse ${CIRCLE_BRANCH})
 ```
 
 ## Third Part Libraries

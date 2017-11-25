@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -z ${TRAVIS+x} ];
+if [ ! -z ${CI} ];
 then
     git config --global user.name "whatever";
     git config --global user.email "whatever@example.com";
