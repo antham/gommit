@@ -86,9 +86,12 @@ func processMatchResult(matchings *[]*gommit.Matching, err error, examples map[s
 }
 
 func buildOptions() gommit.Options {
+	viper.SetDefault("config.summary-length", 50)
+
 	return gommit.Options{
-		viper.GetBool("config.check-summary-length"),
-		viper.GetBool("config.exclude-merge-commits"),
+		CheckSummaryLength:  viper.GetBool("config.check-summary-length"),
+		ExcludeMergeCommits: viper.GetBool("config.exclude-merge-commits"),
+		SummaryLength:       viper.GetInt("config.summary-length"),
 	}
 }
 

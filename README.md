@@ -24,6 +24,7 @@ Create a file ```.gommit.toml``` at the root of your project, for instance :
 [config]
 exclude-merge-commits=true
 check-summary-length=true
+summary-length=50
 
 [matchers]
 all="(?:ref|feat|test|fix|style)\\(.*?\\) : .*?\n(?:\n?(?:\\* |  ).*?\n)*"
@@ -44,7 +45,8 @@ an_extended_commit="""
 #### Config
 
 * ```exclude-merge-commits``` : if set to true, will not check commit mesage for merge commit
-* ```check-summary-length``` : if set to true, check commit summary length is 50 characters
+* ```check-summary-length``` : if set to true, check commit summary length, default is 50 characters
+* ```summary-length``` : you can override the default value summary length, which is 50 characters, this config is used only if check-summary-length is true
 
 #### Matchers
 

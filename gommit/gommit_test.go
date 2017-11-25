@@ -85,6 +85,7 @@ func TestMatchRangeCommitQuery(t *testing.T) {
 		Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -109,6 +110,7 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 		Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -138,6 +140,7 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 		Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -167,6 +170,7 @@ func TestMacthRangeCommitWithAMessageErrorCommitWithoutMergeCommist(t *testing.T
 		Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: true,
+			SummaryLength:       50,
 		},
 	}
 
@@ -196,6 +200,7 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 		Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -223,6 +228,7 @@ func TestMatchRangeCommitWithAnInvalidCommitRange(t *testing.T) {
 		Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -248,6 +254,7 @@ func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
 		Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -292,6 +299,7 @@ func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 		Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -316,6 +324,7 @@ func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 		Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -350,6 +359,7 @@ func TestMatchCommitQuery(t *testing.T) {
 		Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -382,6 +392,7 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 		Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -395,11 +406,15 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 }
 
 func TestIsValidSummaryLengthWithCorrectSize(t *testing.T) {
-	assert.True(t, isValidSummaryLength("test"), "Must have a length lower than 50 characters")
+	assert.True(t, isValidSummaryLength(50, "test"))
+	assert.True(t, isValidSummaryLength(50, "a sequence which is 50 size long abcdefghijklmnopq"), "Must have a length which is excatly 50 characters")
+	assert.True(t, isValidSummaryLength(72, "test"))
+	assert.True(t, isValidSummaryLength(72, "a sequence which is 72 size long abcdefghijklmnopqrstuvwxyz abcdefghijkl"), "Must have a length which is exactly 72 characters")
 }
 
 func TestIsValidSummaryLengthWithInCorrectSize(t *testing.T) {
-	assert.False(t, isValidSummaryLength("ttttttttttttttttttttttttttttttttttttttttttttttttttt"), "Must have a length lower than 50 characters")
+	assert.False(t, isValidSummaryLength(50, "a sequence which is 51 size long abcdefghijklmnopqr"))
+	assert.False(t, isValidSummaryLength(72, "a sequence which is 73 size long abcdefghijklmnopqrstuvwxyz abcdefghijklm"))
 }
 
 func TestIsMergeCommitWithANonMergeCommit(t *testing.T) {

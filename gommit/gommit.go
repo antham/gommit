@@ -46,10 +46,8 @@ type MessageQuery struct {
 type Options struct {
 	CheckSummaryLength  bool
 	ExcludeMergeCommits bool
+	SummaryLength       int
 }
-
-// maxSummarySize represents the maximum length allowed for the message commit summary
-const maxSummarySize = 50
 
 // fetchCommits retrieves all commits in repository between 2 commits references
 func fetchCommits(repoPath string, from string, to string) (*[]*object.Commit, error) {
@@ -83,11 +81,11 @@ func messageMatchTemplate(message string, template string) bool {
 }
 
 // isValidSummaryLength returns true if message size length is lower than characters given by
-// maxSummarySize
-func isValidSummaryLength(message string) bool {
+// summaryLength
+func isValidSummaryLength(summaryLength int, message string) bool {
 	chunks := strings.Split(message, "\n")
 
-	return len(chunks) == 0 || len(chunks[0]) <= maxSummarySize
+	return len(chunks) == 0 || len(chunks[0]) <= summaryLength
 }
 
 // isMergeCommit returns true if a commit is a merge commit
@@ -114,9 +112,9 @@ func analyzeMessage(message string, matchers map[string]string, options Options)
 		}
 	}
 
-	if options.CheckSummaryLength && !isValidSummaryLength(message) {
+	if options.CheckSummaryLength && !isValidSummaryLength(options.SummaryLength, message) {
 		hasError = true
-		matching.SummaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
+		matching.SummaryError = fmt.Errorf("Commit summary length is greater than %d characters", options.SummaryLength)
 	}
 
 	if !matchTemplate {
