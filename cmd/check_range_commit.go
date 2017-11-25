@@ -35,10 +35,7 @@ var checkRangeCommitCmd = &cobra.Command{
 			From:     from,
 			To:       to,
 			Matchers: viper.GetStringMapString("matchers"),
-			Options: map[string]bool{
-				"check-summary-length":  viper.GetBool("config.check-summary-length"),
-				"exclude-merge-commits": viper.GetBool("config.exclude-merge-commits"),
-			},
+			Options:  buildOptions(),
 		}
 
 		matchings, err := gommit.MatchRangeCommitQuery(q)

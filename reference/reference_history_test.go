@@ -259,6 +259,26 @@ func TestFetchCommitIntervalWithHeadReference(t *testing.T) {
 }
 
 func TestFetchCommitIntervalWithCommitIds(t *testing.T) {
+	for _, filename := range []string{"../features/repo.sh", "../features/merge-commits.sh"} {
+		err := exec.Command(filename).Run()
+
+		if err != nil {
+			logrus.Fatal(err)
+		}
+	}
+
+	path, err := os.Getwd()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	repo, err := git.NewFilesystemRepository(path + "/test/.git")
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
 	cmd := exec.Command("git", "rev-parse", "HEAD")
 	cmd.Dir = "test"
 
@@ -277,7 +297,7 @@ func TestFetchCommitIntervalWithCommitIds(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	commits, err := fetchCommitFromAGivenInterval(string(HEAD2[:len(HEAD2)-1]), string(HEAD[:len(HEAD)-1]))
+	commits, err := FetchCommitInterval(repo, string(HEAD2[:len(HEAD2)-1]), string(HEAD[:len(HEAD)-1]))
 
 	assert.NoError(t, err, "Must return no error")
 
@@ -288,7 +308,7 @@ func TestFetchCommitIntervalWithCommitIds(t *testing.T) {
 
 	results := []string{}
 
-	for _, c := range commits {
+	for _, c := range *commits {
 		results = append(results, c.Message)
 	}
 

@@ -2,9 +2,9 @@ package gommit
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
+	"github.com/dlclark/regexp2"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
@@ -23,7 +23,7 @@ type CommitQuery struct {
 	Path     string
 	ID       string
 	Matchers map[string]string
-	Options  map[string]bool
+	Options  Options
 }
 
 // RangeCommitQuery to retrieves commits and do checking
@@ -32,18 +32,22 @@ type RangeCommitQuery struct {
 	From     string
 	To       string
 	Matchers map[string]string
-	Options  map[string]bool
+	Options  Options
 }
 
 // MessageQuery to check only commit message
 type MessageQuery struct {
 	Message  string
 	Matchers map[string]string
-	Options  map[string]bool
+	Options  Options
 }
 
-// maxSummarySize represents maximum length of accommit summary
-const maxSummarySize = 50
+// Options represents options picked from configuration
+type Options struct {
+	CheckSummaryLength  bool
+	ExcludeMergeCommits bool
+	SummaryLength       int
+}
 
 // fetchCommits retrieves all commits in repository between 2 commits references
 func fetchCommits(repoPath string, from string, to string) (*[]*object.Commit, error) {
@@ -67,34 +71,35 @@ func fetchCommit(repoPath string, ID string) (*object.Commit, error) {
 	return reference.FetchCommitByID(repo, ID)
 }
 
-// messageMatchTemplate try to match a commit message against a regexp
+// messageMatchTemplate tries to match a commit message against a regexp
 func messageMatchTemplate(message string, template string) bool {
-	r := regexp.MustCompile(template)
+	r := regexp2.MustCompile(template, 0)
 
-	g := r.FindStringSubmatch(message)
+	b, err := r.MatchString(message)
 
-	return len(g) > 0 && g[0] == message
+	return err == nil && b
 }
 
-// isValidSummaryLength return true if size length is lower than 80 characters
-func isValidSummaryLength(message string) bool {
+// isValidSummaryLength returns true if message size length is lower than characters given by
+// summaryLength
+func isValidSummaryLength(summaryLength int, message string) bool {
 	chunks := strings.Split(message, "\n")
 
-	return len(chunks) == 0 || len(chunks[0]) <= maxSummarySize
+	return len(chunks) == 0 || len(chunks[0]) <= summaryLength
 }
 
-// isMergeCommit return true if a commit is a merge commit
+// isMergeCommit returns true if a commit is a merge commit
 func isMergeCommit(commit *object.Commit) bool {
 	return commit.NumParents() == 2
 }
 
-// IsZeroMatching check if Matching struct equals zero
+// IsZeroMatching checks if Matching struct equals zero
 func IsZeroMatching(matching *Matching) bool {
 	return len(matching.Context) == 0 && matching.MessageError == nil && matching.SummaryError == nil
 }
 
-// analyzeMessage check if a message match
-func analyzeMessage(message string, matchers map[string]string, options map[string]bool) *Matching {
+// analyzeMessage checks if a message match expectations
+func analyzeMessage(message string, matchers map[string]string, options Options) *Matching {
 	matching := Matching{}
 	matchTemplate := false
 	hasError := false
@@ -107,9 +112,9 @@ func analyzeMessage(message string, matchers map[string]string, options map[stri
 		}
 	}
 
-	if options["check-summary-length"] && !isValidSummaryLength(message) {
+	if options.CheckSummaryLength && !isValidSummaryLength(options.SummaryLength, message) {
 		hasError = true
-		matching.SummaryError = fmt.Errorf("Commit summary length is greater than 50 characters")
+		matching.SummaryError = fmt.Errorf("Commit summary length is greater than %d characters", options.SummaryLength)
 	}
 
 	if !matchTemplate {
@@ -124,9 +129,9 @@ func analyzeMessage(message string, matchers map[string]string, options map[stri
 	return &matching
 }
 
-// analyzeCommit check if a commit match
-func analyzeCommit(commit *object.Commit, matchers map[string]string, options map[string]bool) *Matching {
-	if options["exclude-merge-commits"] && isMergeCommit(commit) {
+// analyzeCommit checks if a commit message match expectations
+func analyzeCommit(commit *object.Commit, matchers map[string]string, options Options) *Matching {
+	if options.ExcludeMergeCommits && isMergeCommit(commit) {
 		return &Matching{}
 	}
 
@@ -141,8 +146,8 @@ func analyzeCommit(commit *object.Commit, matchers map[string]string, options ma
 	return m
 }
 
-// analyzeCommits check if a slice of commits match
-func analyzeCommits(commits *[]*object.Commit, matchers map[string]string, options map[string]bool) *[]*Matching {
+// analyzeCommits checks if a slice of commits message match expectations
+func analyzeCommits(commits *[]*object.Commit, matchers map[string]string, options Options) *[]*Matching {
 	matchings := []*Matching{}
 
 	for _, commit := range *commits {
@@ -156,12 +161,12 @@ func analyzeCommits(commits *[]*object.Commit, matchers map[string]string, optio
 	return &matchings
 }
 
-// MatchMessageQuery trigger regexp matching against a message
+// MatchMessageQuery triggers regexp matching against a message
 func MatchMessageQuery(query MessageQuery) (*Matching, error) {
 	return analyzeMessage(query.Message, query.Matchers, query.Options), nil
 }
 
-// MatchCommitQuery trigger regexp matching against a commit
+// MatchCommitQuery triggers regexp matching against a commit
 func MatchCommitQuery(query CommitQuery) (*Matching, error) {
 	commit, err := fetchCommit(query.Path, query.ID)
 
@@ -174,7 +179,7 @@ func MatchCommitQuery(query CommitQuery) (*Matching, error) {
 	return analyzeCommit(commit, query.Matchers, query.Options), nil
 }
 
-// MatchRangeCommitQuery trigger regexp matching against a range message commits
+// MatchRangeCommitQuery triggers regexp matching against a range of commit messages
 func MatchRangeCommitQuery(query RangeCommitQuery) (*[]*Matching, error) {
 	commits, err := fetchCommits(query.Path, query.From, query.To)
 

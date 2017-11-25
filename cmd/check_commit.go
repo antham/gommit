@@ -35,10 +35,7 @@ var checkCommitCmd = &cobra.Command{
 			ID:       ID,
 			Path:     path,
 			Matchers: viper.GetStringMapString("matchers"),
-			Options: map[string]bool{
-				"check-summary-length":  viper.GetBool("config.check-summary-length"),
-				"exclude-merge-commits": viper.GetBool("config.exclude-merge-commits"),
-			},
+			Options:  buildOptions(),
 		}
 
 		matching, err := gommit.MatchCommitQuery(q)

@@ -14,6 +14,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/dlclark/regexp2"
+  packages = [".","syntax"]
+  revision = "487489b64fb796de2e55f4e8a4ad1e145f80e957"
+  version = "v1.1.6"
+
+[[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
@@ -166,6 +172,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a6031d03534027737c04f862c4a8d81b1f1349ccd184268e2281aa47244ee3b3"
+  inputs-digest = "98dcfe6458394a13c1dfbb4f79a89f03ce262d40bc2a1ebfb59d0ebfd4b347a4"
   solver-name = "gps-cdcl"
   solver-version = 1
