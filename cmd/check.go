@@ -16,9 +16,7 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Check ensure a message follows defined patterns",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := cmd.Help()
-
-		if err != nil {
+		if err := cmd.Help(); err != nil {
 			failure(err)
 
 			exitError()
