@@ -57,11 +57,7 @@ func extractCheckCommitArgs(args []string) (string, string, error) {
 
 	ok, err := regexp.Match("[a-fA-F0-9]{40}", []byte(args[0]))
 
-	if err != nil {
-		return "", "", err
-	}
-
-	if !ok {
+	if err != nil || !ok {
 		return "", "", fmt.Errorf("Argument must be a valid commit id")
 	}
 
