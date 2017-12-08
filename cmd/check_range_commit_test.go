@@ -41,16 +41,16 @@ func TestCheckRangeCommitWithErrors(t *testing.T) {
 	}
 
 	arguments := [][]string{
-		[]string{
+		{
 			"check",
 			"range",
 		},
-		[]string{
+		{
 			"check",
 			"range",
 			"master~2",
 		},
-		[]string{
+		{
 			"check",
 			"range",
 			"master~1",
@@ -58,35 +58,35 @@ func TestCheckRangeCommitWithErrors(t *testing.T) {
 			"test",
 			"whatever",
 		},
-		[]string{
+		{
 			"check",
 			"range",
 			"master~1",
 			"master~2",
 			"whatever",
 		},
-		[]string{
+		{
 			"check",
 			"range",
 			"master~1",
 			"master~2",
 			"check.go",
 		},
-		[]string{
+		{
 			"check",
 			"range",
 			"whatever",
 			"master",
 			"test/",
 		},
-		[]string{
+		{
 			"check",
 			"range",
 			"master~2",
 			"master~1",
 			"test/",
 		},
-		[]string{
+		{
 			"check",
 			"range",
 			"master~2",

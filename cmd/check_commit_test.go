@@ -41,40 +41,40 @@ func TestCheckCommitWithErrors(t *testing.T) {
 	}
 
 	arguments := [][]string{
-		[]string{
+		{
 			"check",
 			"commit",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"whatever",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"whatever",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"test",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"test",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"test",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
