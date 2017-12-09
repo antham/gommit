@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/antham/gommit/gommit"
 )
 
 func TestVersion(t *testing.T) {
@@ -44,5 +46,5 @@ func TestVersion(t *testing.T) {
 	w.Wait()
 
 	assert.EqualValues(t, 0, code, "Must exit without errors (exit 0)")
-	assert.EqualValues(t, "v2.0.0", message, "Must return app version")
+	assert.EqualValues(t, gommit.GetVersion(), message, "Must return app version")
 }
