@@ -9,19 +9,19 @@ import (
 
 func TestParseSymbolicReferencePathWithErrors(t *testing.T) {
 	datas := [][]string{
-		[]string{".test", `branch name must not start with a dot`, "Must not start with a dot"},
-		[]string{"te..st", `branch name must not contains any double dot`, "Must not contains double dot"},
-		[]string{"test..", `branch name must not contains any double dot`, "Must not contains double dot"},
-		[]string{"test/", `branch name must not end with a slash`, "Must not end with a slash"},
-		[]string{"test/~", `branch name must not end with a slash`, "Must not end with a slash"},
-		[]string{"test/^", `branch name must not end with a slash`, "Must not end with a slash"},
-		[]string{"test.lock", `branch name cannot end with .lock`, "Must not end with .lock"},
-		[]string{"test.lock~", `branch name cannot end with .lock`, "Must not end with .lock"},
-		[]string{"test.lock^", `branch name cannot end with .lock`, "Must not end with .lock"},
-		[]string{"test.LOCK", `branch name cannot end with .lock`, "Must not end with .lock"},
-		[]string{"te st", `branch name contains a space character`, "Must not contains a space"},
-		[]string{"master~^22", `level associated to a caret must be 1 or 2`, "A number must follow a tilde or circumflex accent"},
-		[]string{"master~tg^", `must be a caret or a tilde and may be followed with a number`, "Must be compound of tilde or circumflex accent"},
+		{".test", `branch name must not start with a dot`, "Must not start with a dot"},
+		{"te..st", `branch name must not contains any double dot`, "Must not contains double dot"},
+		{"test..", `branch name must not contains any double dot`, "Must not contains double dot"},
+		{"test/", `branch name must not end with a slash`, "Must not end with a slash"},
+		{"test/~", `branch name must not end with a slash`, "Must not end with a slash"},
+		{"test/^", `branch name must not end with a slash`, "Must not end with a slash"},
+		{"test.lock", `branch name cannot end with .lock`, "Must not end with .lock"},
+		{"test.lock~", `branch name cannot end with .lock`, "Must not end with .lock"},
+		{"test.lock^", `branch name cannot end with .lock`, "Must not end with .lock"},
+		{"test.LOCK", `branch name cannot end with .lock`, "Must not end with .lock"},
+		{"te st", `branch name contains a space character`, "Must not contains a space"},
+		{"master~^22", `level associated to a caret must be 1 or 2`, "A number must follow a tilde or circumflex accent"},
+		{"master~tg^", `must be a caret or a tilde and may be followed with a number`, "Must be compound of tilde or circumflex accent"},
 	}
 
 	for _, data := range datas {
@@ -40,15 +40,15 @@ func TestParseSymbolicReferencePath(t *testing.T) {
 	}
 
 	expected := []symbolicRefPathStmt{
-		symbolicRefPathStmt{
+		{
 			"master",
 			[]int{},
 		},
-		symbolicRefPathStmt{
+		{
 			"master",
 			[]int{1, 1},
 		},
-		symbolicRefPathStmt{
+		{
 			"master",
 			[]int{1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		},

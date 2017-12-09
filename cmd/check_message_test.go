@@ -35,16 +35,16 @@ func TestCheckMessageWithErrors(t *testing.T) {
 	}
 
 	arguments := [][]string{
-		[]string{
+		{
 			"check",
 			"message",
 		},
-		[]string{
+		{
 			"check",
 			"message",
 			"test",
 		},
-		[]string{
+		{
 			"check",
 			"message",
 			"test",

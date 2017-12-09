@@ -41,40 +41,53 @@ func TestCheckCommitWithErrors(t *testing.T) {
 	}
 
 	arguments := [][]string{
-		[]string{
+		{
 			"check",
 			"commit",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"whatever",
 		},
-		[]string{
+		{
+			"check",
+			"commit",
+			"whatever",
+			"whatever",
+		},
+		{
+			"check",
+			"commit",
+			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
+			"whatever",
+			"whatever",
+		},
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"whatever",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"test",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"test",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
 			"test",
 		},
-		[]string{
+		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
@@ -85,6 +98,8 @@ func TestCheckCommitWithErrors(t *testing.T) {
 	errors := []error{
 		fmt.Errorf("One argument required : commit id"),
 		fmt.Errorf(`Argument must be a valid commit id`),
+		fmt.Errorf(`Argument must be a valid commit id`),
+		fmt.Errorf(`2 arguments must be provided at most`),
 		fmt.Errorf(`Ensure "whatever" directory exists`),
 		fmt.Errorf(`object not found`),
 		fmt.Errorf(`At least one matcher must be defined`),
@@ -93,6 +108,8 @@ func TestCheckCommitWithErrors(t *testing.T) {
 	}
 
 	configs := []string{
+		path + "/../features/.gommit.toml",
+		path + "/../features/.gommit.toml",
 		path + "/../features/.gommit.toml",
 		path + "/../features/.gommit.toml",
 		path + "/../features/.gommit.toml",

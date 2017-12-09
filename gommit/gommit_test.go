@@ -82,9 +82,10 @@ func TestMatchRangeCommitQuery(t *testing.T) {
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -106,9 +107,10 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -135,9 +137,10 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 		"master~1",
 		"master",
 		map[string]string{"simple": ".*\n"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -164,9 +167,10 @@ func TestMacthRangeCommitWithAMessageErrorCommitWithoutMergeCommist(t *testing.T
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": true,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: true,
+			SummaryLength:       50,
 		},
 	}
 
@@ -193,9 +197,10 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 		"master~2",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -220,9 +225,10 @@ func TestMatchRangeCommitWithAnInvalidCommitRange(t *testing.T) {
 		"master",
 		"master~2",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -245,9 +251,10 @@ func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
 		"master~15",
 		"master",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -267,9 +274,9 @@ func TestMatchMessageQuery(t *testing.T) {
 	q := MessageQuery{
 		"update(file) : fix",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
 		},
 	}
 
@@ -289,9 +296,10 @@ func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 	q := MessageQuery{
 		"update(file) :",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		map[string]bool{
-			"check-summary-length":  false,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -313,9 +321,10 @@ func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 	q := MessageQuery{
 		"update(file) : test test test test test test test test test test test test test test",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -347,9 +356,10 @@ func TestMatchCommitQuery(t *testing.T) {
 		"test/",
 		string(ID[:len(ID)-1]),
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -379,9 +389,10 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 		"test/",
 		string(ID[:len(ID)-1]),
 		map[string]string{"simple": "whatever"},
-		map[string]bool{
-			"check-summary-length":  true,
-			"exclude-merge-commits": false,
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
 		},
 	}
 
@@ -394,12 +405,71 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	assert.NoError(t, m.SummaryError, "Must not contains error")
 }
 
+func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = "test"
+
+	ID, err := cmd.Output()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := CommitQuery{
+		"testtestest/",
+		string(ID[:len(ID)-1]),
+		map[string]string{"simple": "whatever"},
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
+		},
+	}
+
+	_, err = MatchCommitQuery(q)
+
+	assert.Error(t, err, "Must return an error")
+}
+
+func TestMatchCommitQueryWithAnUnexistingCommit(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := CommitQuery{
+		"test/",
+		"4e1243bd22c66e76c2ba9eddc1f91394e57f9f83",
+		map[string]string{"simple": "whatever"},
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
+		},
+	}
+
+	_, err = MatchCommitQuery(q)
+
+	assert.Error(t, err, "Must return an error")
+}
+
 func TestIsValidSummaryLengthWithCorrectSize(t *testing.T) {
-	assert.True(t, isValidSummaryLength("test"), "Must have a length lower than 50 characters")
+	assert.True(t, isValidSummaryLength(50, "test"))
+	assert.True(t, isValidSummaryLength(50, "a sequence which is 50 size long abcdefghijklmnopq"), "Must have a length which is excatly 50 characters")
+	assert.True(t, isValidSummaryLength(72, "test"))
+	assert.True(t, isValidSummaryLength(72, "a sequence which is 72 size long abcdefghijklmnopqrstuvwxyz abcdefghijkl"), "Must have a length which is exactly 72 characters")
 }
 
 func TestIsValidSummaryLengthWithInCorrectSize(t *testing.T) {
-	assert.False(t, isValidSummaryLength("ttttttttttttttttttttttttttttttttttttttttttttttttttt"), "Must have a length lower than 50 characters")
+	assert.False(t, isValidSummaryLength(50, "a sequence which is 51 size long abcdefghijklmnopqr"))
+	assert.False(t, isValidSummaryLength(72, "a sequence which is 73 size long abcdefghijklmnopqrstuvwxyz abcdefghijklm"))
 }
 
 func TestIsMergeCommitWithANonMergeCommit(t *testing.T) {

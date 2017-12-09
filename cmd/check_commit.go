@@ -35,10 +35,7 @@ var checkCommitCmd = &cobra.Command{
 			ID:       ID,
 			Path:     path,
 			Matchers: viper.GetStringMapString("matchers"),
-			Options: map[string]bool{
-				"check-summary-length":  viper.GetBool("config.check-summary-length"),
-				"exclude-merge-commits": viper.GetBool("config.exclude-merge-commits"),
-			},
+			Options:  buildOptions(),
 		}
 
 		matching, err := gommit.MatchCommitQuery(q)
@@ -60,11 +57,7 @@ func extractCheckCommitArgs(args []string) (string, string, error) {
 
 	ok, err := regexp.Match("[a-fA-F0-9]{40}", []byte(args[0]))
 
-	if err != nil {
-		return "", "", err
-	}
-
-	if !ok {
+	if err != nil || !ok {
 		return "", "", fmt.Errorf("Argument must be a valid commit id")
 	}
 

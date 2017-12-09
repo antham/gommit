@@ -1,4 +1,4 @@
-Gommit [![Build Status](https://travis-ci.org/antham/gommit.svg?branch=master)](https://travis-ci.org/antham/gommit) [![codecov](https://codecov.io/gh/antham/gommit/branch/master/graph/badge.svg)](https://codecov.io/gh/antham/gommit) [![codebeat badge](https://codebeat.co/badges/cc515300-053e-4b62-8184-645be6e6aa2f)](https://codebeat.co/projects/github-com-antham-gommit)
+Gommit [![CircleCI](https://circleci.com/gh/antham/gommit/tree/master.svg?style=svg)](https://circleci.com/gh/antham/gommit/tree/master) [![codecov](https://codecov.io/gh/antham/gommit/branch/master/graph/badge.svg)](https://codecov.io/gh/antham/gommit) [![codebeat badge](https://codebeat.co/badges/cc515300-053e-4b62-8184-645be6e6aa2f)](https://codebeat.co/projects/github-com-antham-gommit)
 ======
 
 Gommit analyze commits messages to ensure they follow defined pattern.
@@ -24,6 +24,7 @@ Create a file ```.gommit.toml``` at the root of your project, for instance :
 [config]
 exclude-merge-commits=true
 check-summary-length=true
+summary-length=50
 
 [matchers]
 all="(?:ref|feat|test|fix|style)\\(.*?\\) : .*?\n(?:\n?(?:\\* |  ).*?\n)*"
@@ -44,11 +45,12 @@ an_extended_commit="""
 #### Config
 
 * ```exclude-merge-commits``` : if set to true, will not check commit mesage for merge commit
-* ```check-summary-length``` : if set to true, check commit summary length is 50 characters
+* ```check-summary-length``` : if set to true, check commit summary length, default is 50 characters
+* ```summary-length``` : you can override the default value summary length, which is 50 characters, this config is used only if check-summary-length is true
 
 #### Matchers
 
-You can define as many matchers you want, naming is up to you, they will all be compared against a commit message till one match.
+You can define as many matchers you want using regexp, naming is up to you, they will all be compared against a commit message till one match. Regexps used support comments, possessive match, positive lookahead, negative lookahead, positive lookbehind, negative lookbehind, back reference, named back referenc and conditionals.
 
 #### Examples
 
@@ -194,22 +196,25 @@ script: perl test-branch-commit-messages-in-travis.pl
 
 ### CircleCI
 
-In CircleCI, there is an environment variable that describe current branch : ```CIRCLE_BRANCH``` (https://circleci.com/docs/environment-variables/).
+In CircleCI (2.0), there is an environment variable that describe current branch : ```CIRCLE_BRANCH``` (https://circleci.com/docs/2.0/env-vars/#circleci-environment-variable-descriptions).
 
-First, we download the binary from the release page according to the version we want and we add in ```circle.yml``` :
+First, we download the binary from the release page according to the version we want and we add in ```.circleci/config.yml``` :
 
 ```yaml
-dependencies:
-  pre:
-    - wget -O /home/ubuntu/bin/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 /home/ubuntu/bin/gommit
+- run:
+    name: Get gommit binary
+    command: |
+      mkdir /home/circleci/bin
+      wget -O ~/bin/gommit https://github.com/antham/gommit/releases/download/v2.0.0/gommit_linux_386 && chmod 777 ~/bin/gommit
 ```
 
-And in ```test``` we can run gommit against master for instance :
+And we can run gommit against master for instance :
 
 ```
-test:
-  override:
-    - gommit check range master $CIRCLE_BRANCH
+- run:
+    name: Run gommit
+    command: |
+      ~/bin/gommit check range $(git rev-parse origin/master) $(git rev-parse ${CIRCLE_BRANCH})
 ```
 
 ## Third Part Libraries
