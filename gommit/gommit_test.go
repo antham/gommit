@@ -405,6 +405,61 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	assert.NoError(t, m.SummaryError, "Must not contains error")
 }
 
+func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = "test"
+
+	ID, err := cmd.Output()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := CommitQuery{
+		"testtestest/",
+		string(ID[:len(ID)-1]),
+		map[string]string{"simple": "whatever"},
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
+		},
+	}
+
+	_, err = MatchCommitQuery(q)
+
+	assert.Error(t, err, "Must return an error")
+}
+
+func TestMatchCommitQueryWithAnUnexistingCommit(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := CommitQuery{
+		"test/",
+		"4e1243bd22c66e76c2ba9eddc1f91394e57f9f83",
+		map[string]string{"simple": "whatever"},
+		Options{
+			CheckSummaryLength:  true,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
+		},
+	}
+
+	_, err = MatchCommitQuery(q)
+
+	assert.Error(t, err, "Must return an error")
+}
+
 func TestIsValidSummaryLengthWithCorrectSize(t *testing.T) {
 	assert.True(t, isValidSummaryLength(50, "test"))
 	assert.True(t, isValidSummaryLength(50, "a sequence which is 50 size long abcdefghijklmnopq"), "Must have a length which is excatly 50 characters")
