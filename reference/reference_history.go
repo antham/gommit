@@ -145,7 +145,7 @@ func parseCommitHistory(from *refSolver, to *refSolver) (*[]*object.Commit, erro
 		cs, errs := parseTree((*commits)[i], (*commits)[i+1])
 
 		if len(errs) > 0 {
-			return nil, fmt.Errorf("An error occured when retrieving commits between %s and %s", from.commitRef.ID(), to.commitRef.ID())
+			return nil, fmt.Errorf("An error occurred when retrieving commits between %s and %s", from.commitRef.ID(), to.commitRef.ID())
 		}
 
 		results = append(results, cs...)

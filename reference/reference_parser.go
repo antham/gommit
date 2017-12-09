@@ -8,7 +8,7 @@ import (
 )
 
 // symbolicRefPathStmt parse a following statement master~2
-// to split branch name and refrence path
+// to split branch name and reference path
 type symbolicRefPathStmt struct {
 	branchName string
 	refPath    []int

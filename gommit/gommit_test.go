@@ -462,7 +462,7 @@ func TestMatchCommitQueryWithAnUnexistingCommit(t *testing.T) {
 
 func TestIsValidSummaryLengthWithCorrectSize(t *testing.T) {
 	assert.True(t, isValidSummaryLength(50, "test"))
-	assert.True(t, isValidSummaryLength(50, "a sequence which is 50 size long abcdefghijklmnopq"), "Must have a length which is excatly 50 characters")
+	assert.True(t, isValidSummaryLength(50, "a sequence which is 50 size long abcdefghijklmnopq"), "Must have a length which is exactly 50 characters")
 	assert.True(t, isValidSummaryLength(72, "test"))
 	assert.True(t, isValidSummaryLength(72, "a sequence which is 72 size long abcdefghijklmnopqrstuvwxyz abcdefghijkl"), "Must have a length which is exactly 72 characters")
 }
