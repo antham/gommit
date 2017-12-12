@@ -25,8 +25,10 @@ var checkCmd = &cobra.Command{
 }
 
 func parseDirectory(path string) (string, error) {
+	var err error
+
 	if path == "" {
-		if _, err := os.Getwd(); err != nil {
+		if path, err = os.Getwd(); err != nil {
 			return "", err
 		}
 	} else {
