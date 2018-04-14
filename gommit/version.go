@@ -1,6 +1,6 @@
 package gommit
 
-var appVersion = "2.1.1"
+var appVersion = "2.1.2"
 
 // GetVersion return app version
 func GetVersion() string {
