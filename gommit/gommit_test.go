@@ -15,12 +15,12 @@ func TestFetchCommitsWithValidInterval(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	commits, err := fetchCommits("test", "master~2", "master")
+	commits, err := fetchCommits("testing-repository", "test~2", "test")
 	assert.NoError(t, err, "Must return no errors")
 
 	expected := []string{
-		"update(file1) : update file 1\n\nupdate file 1 with a text\n",
-		"feat(file2) : new file 2\n\ncreate a new file 2\n",
+		"feat(file8) : new file 8\n\ncreate a new file 8\n",
+		"feat(file7) : new file 7\n\ncreate a new file 7\n",
 	}
 
 	assert.Len(t, *commits, 2, "Must contains 2 commits")
@@ -31,12 +31,12 @@ func TestFetchCommitsWithValidInterval(t *testing.T) {
 }
 
 func TestFetchCommitsWithWrongRepository(t *testing.T) {
-	_, err := fetchCommits("testtesttest", "4906f72818c0185162a3ec9c39a711d7c2842d40", "master")
+	_, err := fetchCommits("testtesttest", "4906f72818c0185162a3ec9c39a711d7c2842d40", "test")
 	assert.Error(t, err, "Must return an error")
 }
 
 func TestFetchCommitsWithWrongInterval(t *testing.T) {
-	_, err := fetchCommits("test", "4906f72818c0185162a3ec9c39a711d7c2842d40", "maste")
+	_, err := fetchCommits("testing-repository", "4906f72818c0185162a3ec9c39a711d7c2842d40", "maste")
 	assert.Error(t, err, "Must return an error")
 }
 
@@ -78,9 +78,9 @@ func TestMatchRangeCommitQuery(t *testing.T) {
 	}
 
 	q := RangeCommitQuery{
-		"test/",
-		"master~2",
-		"master",
+		"testing-repository/",
+		"test~2",
+		"test",
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
 		Options{
 			CheckSummaryLength:  false,
@@ -103,9 +103,9 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 	}
 
 	q := RangeCommitQuery{
-		"test/",
-		"master~2",
-		"master",
+		"testing-repository/",
+		"test~2",
+		"test",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
 		Options{
 			CheckSummaryLength:  false,
@@ -117,8 +117,8 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
-	assert.Len(t, *m, 1, "Must return one item")
-	assert.Equal(t, "feat(file2) : new file 2\n\ncreate a new file 2\n", (*m)[0].Context["message"], "Must contains commit message")
+	assert.Len(t, *m, 2, "Must return two items")
+	assert.Equal(t, "feat(file8) : new file 8\n\ncreate a new file 8\n", (*m)[0].Context["message"], "Must contains commit message")
 	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
@@ -133,9 +133,9 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 	}
 
 	q := RangeCommitQuery{
-		"test/",
-		"master~1",
-		"master",
+		"testing-repository/",
+		"test~1",
+		"test",
 		map[string]string{"simple": ".*\n"},
 		Options{
 			CheckSummaryLength:  true,
@@ -153,8 +153,8 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 	assert.EqualError(t, (*m)[0].SummaryError, "Commit summary length is greater than 50 characters", "Must contains summary message error")
 }
 
-func TestMacthRangeCommitWithAMessageErrorCommitWithoutMergeCommist(t *testing.T) {
-	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
+func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
+	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
 
 		if err != nil {
@@ -163,9 +163,9 @@ func TestMacthRangeCommitWithAMessageErrorCommitWithoutMergeCommist(t *testing.T
 	}
 
 	q := RangeCommitQuery{
-		"test/",
-		"master~2",
-		"master",
+		"testing-repository/",
+		"test^^^^",
+		"test",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
 		Options{
 			CheckSummaryLength:  false,
@@ -177,14 +177,16 @@ func TestMacthRangeCommitWithAMessageErrorCommitWithoutMergeCommist(t *testing.T
 	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
-	assert.Len(t, *m, 1, "Must return one item")
-	assert.Equal(t, "feat(file) : new file 3\n\ncreate a new file 3\n", (*m)[0].Context["message"], "Must contains commit message")
+	assert.Len(t, *m, 7)
+	for i := 0; i < 7; i++ {
+		assert.NotContains(t, (*m)[i].Context["message"], "Merge")
+	}
 	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
 func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
-	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
+	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
 
 		if err != nil {
@@ -193,9 +195,9 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 	}
 
 	q := RangeCommitQuery{
-		"test/",
-		"master~2",
-		"master",
+		"testing-repository/",
+		"test^^^^",
+		"test",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
 		Options{
 			CheckSummaryLength:  false,
@@ -207,36 +209,9 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 	m, err := MatchRangeCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
-	assert.Len(t, *m, 2, "Must return two itesm")
-	assert.Equal(t, "Merge branch 'test'\n", (*m)[0].Context["message"], "Must contains commit message")
+	assert.Len(t, *m, 9, "Must return two itesm")
 	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
-}
-
-func TestMatchRangeCommitWithAnInvalidCommitRange(t *testing.T) {
-	err := exec.Command("../features/repo.sh").Run()
-
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	q := RangeCommitQuery{
-		"test/",
-		"master",
-		"master~2",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
-			CheckSummaryLength:  false,
-			ExcludeMergeCommits: false,
-			SummaryLength:       50,
-		},
-	}
-
-	m, err := MatchRangeCommitQuery(q)
-
-	assert.Error(t, err, "Must return an error")
-	assert.EqualError(t, err, `No commits found between "master" and "master~2"`, "Must return an explicit message error")
-	assert.Len(t, *m, 0, "Must return no item")
 }
 
 func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
@@ -247,9 +222,9 @@ func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
 	}
 
 	q := RangeCommitQuery{
-		"test/",
-		"master~15",
-		"master",
+		"testing-repository/",
+		"test~15",
+		"test",
 		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
 		Options{
 			CheckSummaryLength:  false,
@@ -260,7 +235,7 @@ func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
 
 	m, err := MatchRangeCommitQuery(q)
 
-	assert.EqualError(t, err, "Can't find reference", "Must return an error")
+	assert.EqualError(t, err, "Reference \"test~15\" can't be found in git repository")
 	assert.Len(t, *m, 0, "Must return no item")
 }
 
@@ -343,8 +318,8 @@ func TestMatchCommitQuery(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	cmd := exec.Command("git", "rev-parse", "HEAD")
-	cmd.Dir = "test"
+	cmd := exec.Command("git", "rev-parse", "test")
+	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
 
@@ -353,7 +328,7 @@ func TestMatchCommitQuery(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"test/",
+		"testing-repository/",
 		string(ID[:len(ID)-1]),
 		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
 		Options{
@@ -376,8 +351,8 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 		logrus.Fatal(err)
 	}
 
-	cmd := exec.Command("git", "rev-parse", "HEAD")
-	cmd.Dir = "test"
+	cmd := exec.Command("git", "rev-parse", "test")
+	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
 
@@ -386,7 +361,7 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	}
 
 	q := CommitQuery{
-		"test/",
+		"testing-repository/",
 		string(ID[:len(ID)-1]),
 		map[string]string{"simple": "whatever"},
 		Options{
@@ -399,7 +374,7 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	m, err := MatchCommitQuery(q)
 
 	assert.NoError(t, err, "Must return no error")
-	assert.Equal(t, "update(file1) : update file 1\n\nupdate file 1 with a text\n", m.Context["message"], "Must contains commit message")
+	assert.Equal(t, "feat(file8) : new file 8\n\ncreate a new file 8\n", m.Context["message"], "Must contains commit message")
 	assert.Equal(t, string(ID[:len(ID)-1]), m.Context["ID"], "Must contains commit id")
 	assert.EqualError(t, m.MessageError, "No template match commit message", "Must contains commit message error")
 	assert.NoError(t, m.SummaryError, "Must not contains error")
@@ -412,8 +387,8 @@ func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	cmd := exec.Command("git", "rev-parse", "HEAD")
-	cmd.Dir = "test"
+	cmd := exec.Command("git", "rev-parse", "test")
+	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
 
@@ -445,7 +420,7 @@ func TestMatchCommitQueryWithAnUnexistingCommit(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"test/",
+		"testing-repository/",
 		"4e1243bd22c66e76c2ba9eddc1f91394e57f9f83",
 		map[string]string{"simple": "whatever"},
 		Options{
@@ -479,7 +454,7 @@ func TestIsMergeCommitWithANonMergeCommit(t *testing.T) {
 		logrus.Fatal(err)
 	}
 
-	commits, err := fetchCommits("test", "master~2", "master")
+	commits, err := fetchCommits("testing-repository", "test~2", "test")
 
 	if err != nil {
 		logrus.Fatal(err)
@@ -489,7 +464,7 @@ func TestIsMergeCommitWithANonMergeCommit(t *testing.T) {
 }
 
 func TestIsMergeCommitWithAMergeCommit(t *testing.T) {
-	for _, filename := range []string{"../features/repo.sh", "../features/merge-commit.sh"} {
+	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
 
 		if err != nil {
@@ -497,7 +472,7 @@ func TestIsMergeCommitWithAMergeCommit(t *testing.T) {
 		}
 	}
 
-	commits, err := fetchCommits("test", "master~2", "master")
+	commits, err := fetchCommits("testing-repository", "test~3", "test~2")
 
 	if err != nil {
 		logrus.Fatal(err)

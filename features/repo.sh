@@ -1,5 +1,7 @@
 #!/bin/bash
 
+gitRepositoryPath=testing-repository
+
 if [ ! -z ${CI} ];
 then
     git config --global user.name "whatever";
@@ -9,33 +11,94 @@ fi
 # Configure name
 
 # Init
-rm -rf test > /dev/null
-git init test
-cd test
+rm -rf $gitRepositoryPath > /dev/null
+git init $gitRepositoryPath
+cd $gitRepositoryPath || exit 1
 
-# Create file 1
+# Create branch test
+git checkout --quiet -b test
+
+# Create several commits on test branch
 touch file1
 git add file1
-git commit -F- <<EOF
-feat(file) : new file 1
+git commit --quiet -F- <<EOF
+feat(file1) : new file 1
 
 create a new file 1
 EOF
 
-# Create file 2
 touch file2
 git add file2
-git commit -F- <<EOF
+git commit --quiet -F- <<EOF
 feat(file2) : new file 2
 
 create a new file 2
 EOF
 
-# Update file 1
-echo "test" > file1
-git add file1
-git commit -F- <<EOF
-update(file1) : update file 1
+# Create branch test1
+git checkout --quiet -b test1
 
-update file 1 with a text
+touch file3
+git add file3
+git commit --quiet -F- <<EOF
+feat(file3) : new file 3
+
+create a new file 3
+EOF
+
+touch file4
+git add file4
+git commit --quiet -F- <<EOF
+feat(file4) : new file 4
+
+create a new file 4
+EOF
+
+# Create branch test2
+git checkout --quiet -b test2
+
+touch file5
+git add file5
+git commit --quiet -F- <<EOF
+feat(file5) : new file 5
+
+create a new file 5
+EOF
+
+touch file6
+git add file6
+git commit --quiet -F- <<EOF
+feat(file6) : new file 6
+
+create a new file 6
+EOF
+
+# Checkout branch test1
+git checkout --quiet test1
+
+# Merge branch test2
+git merge --quiet --no-edit --no-ff test2
+
+# Checkout branch test
+git checkout --quiet test
+
+# Merge branch test1
+git merge --quiet --no-edit --no-ff test1
+
+# Create several commits on main test branch
+
+touch file7
+git add file7
+git commit --quiet -F- <<EOF
+feat(file7) : new file 7
+
+create a new file 7
+EOF
+
+touch file8
+git add file8
+git commit --quiet -F- <<EOF
+feat(file8) : new file 8
+
+create a new file 8
 EOF

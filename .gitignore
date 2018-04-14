@@ -4,3 +4,10 @@
 /coverage.txt
 /cmd/test/
 /build/*
+/reference/shallow-repository-test/
+/reference/testing-repository/
+/cmd/testing-repository/
+/gommit/testing-repository/
+/cmd/test-repository/
+/gommit/test-repository/
+/reference/test-repository/

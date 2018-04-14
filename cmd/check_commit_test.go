@@ -73,25 +73,25 @@ func TestCheckCommitWithErrors(t *testing.T) {
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
-			"test",
+			"testing-repository",
 		},
 		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
-			"test",
+			"testing-repository",
 		},
 		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
-			"test",
+			"testing-repository",
 		},
 		{
 			"check",
 			"commit",
 			"826f193edd4ba9d6d1799b66fa64f9a84f1db3bf",
-			"test",
+			"testing-repository",
 		},
 	}
 
@@ -178,7 +178,7 @@ func TestCheckCommit(t *testing.T) {
 	}
 
 	cmd := exec.Command("git", "rev-parse", "HEAD")
-	cmd.Dir = "test"
+	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
 
@@ -197,7 +197,7 @@ func TestCheckCommit(t *testing.T) {
 			w.Done()
 		}()
 
-		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "commit", string(ID[:len(ID)-1]), path + "/test"}
+		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "commit", string(ID[:len(ID)-1]), path + "/testing-repository"}
 
 		Execute()
 	}()
@@ -240,7 +240,7 @@ func TestCheckCommitWithBadMessage(t *testing.T) {
 	}
 
 	cmd := exec.Command("git", "rev-parse", "HEAD")
-	cmd.Dir = "test"
+	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
 
@@ -270,7 +270,7 @@ func TestCheckCommitWithBadMessage(t *testing.T) {
 			w.Done()
 		}()
 
-		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "commit", string(ID[:len(ID)-1]), path + "/test"}
+		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "commit", string(ID[:len(ID)-1]), path + "/testing-repository"}
 
 		Execute()
 	}()

@@ -77,21 +77,21 @@ func TestCheckRangeCommitWithErrors(t *testing.T) {
 			"range",
 			"whatever",
 			"master",
-			"test/",
+			"testing-repository/",
 		},
 		{
 			"check",
 			"range",
 			"master~2",
 			"master~1",
-			"test/",
+			"testing-repository/",
 		},
 		{
 			"check",
 			"range",
 			"master~2",
 			"master~1",
-			"test/",
+			"testing-repository/",
 		},
 	}
 
@@ -101,7 +101,7 @@ func TestCheckRangeCommitWithErrors(t *testing.T) {
 		fmt.Errorf("3 arguments must be provided at most"),
 		fmt.Errorf(`Ensure "whatever" directory exists`),
 		fmt.Errorf(`"check.go" must be a directory`),
-		fmt.Errorf(`Can't find reference "whatever"`),
+		fmt.Errorf(`Reference "whatever" can't be found in git repository`),
 		fmt.Errorf(`At least one matcher must be defined`),
 		fmt.Errorf(`At least one example must be defined`),
 	}
@@ -193,7 +193,7 @@ func TestCheckRangeCommitWithBadCommitMessage(t *testing.T) {
 			w.Done()
 		}()
 
-		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "range", "master~3", "master", path + "/test"}
+		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "range", "test~3", "test", path + "/testing-repository"}
 
 		Execute()
 	}()
@@ -247,7 +247,7 @@ func TestCheckRangeCommitWithNoErrors(t *testing.T) {
 			w.Done()
 		}()
 
-		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "range", "master~2", "master", path + "/test"}
+		os.Args = []string{"", "--config", path + "/../features/.gommit.toml", "check", "range", "test~2", "test", path + "/testing-repository"}
 
 		Execute()
 	}()

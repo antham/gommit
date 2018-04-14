@@ -1,233 +1,89 @@
 package reference
 
 import (
-	"bytes"
 	"fmt"
-	"strings"
 
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
-// refSolver match a SymbolicRefPathStmt against
-// a repository to resolve commit refSolver and commit reference
-type refSolver struct {
-	stmt      *symbolicRefPathStmt
-	commitRef *object.Commit
+// node is a tree node in commit tree
+type node struct {
+	value  *object.Commit
+	parent *node
 }
 
-// newRefSolver creates a new RefSolver object
-func newRefSolver(stmt *symbolicRefPathStmt, repo *git.Repository) (*refSolver, error) {
-	hash, err := resolveHash(stmt.branchName, repo)
-
-	if err != nil {
-		return nil, err
-	}
-
-	commitRef, err := repo.CommitObject(hash)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for _, path := range stmt.refPath {
-		parents := commitRef.Parents()
-		parentCount := commitRef.NumParents()
-
-		if parentCount == 0 {
-			return nil, fmt.Errorf(`Can't find reference`)
-		}
-
-		for i := 1; i <= parentCount; i++ {
-			commit, err := parents.Next()
-
-			if err != nil {
-				return nil, fmt.Errorf("Can't find parent")
-			}
-
-			if path == i {
-				commitRef = commit
-			}
-		}
-	}
-
-	return &refSolver{stmt, commitRef}, nil
+// errNoDiffBetweenReferences is triggered when we can't
+// produce any diff between 2 references
+type errNoDiffBetweenReferences struct {
+	from string
+	to   string
 }
 
-// resolveHash give hash commit for a given string reference
-func resolveHash(refCommit string, repository *git.Repository) (plumbing.Hash, error) {
-	hash := plumbing.Hash{}
-
-	if strings.ToLower(refCommit) == "head" {
-		head, err := repository.Head()
-
-		if err == nil {
-			return head.Hash(), nil
-		}
-	}
-
-	iter, err := repository.References()
-
-	if err != nil {
-		return plumbing.Hash{}, err
-	}
-
-	err = iter.ForEach(func(ref *plumbing.Reference) error {
-		if ref.Name().Short() == refCommit {
-			hash = ref.Hash()
-		}
-
-		return nil
-	})
-
-	if err == nil && !hash.IsZero() {
-		return hash, err
-	}
-
-	hash = plumbing.NewHash(refCommit)
-
-	_, err = repository.CommitObject(hash)
-
-	if err == nil && !hash.IsZero() {
-		return hash, nil
-	}
-
-	return hash, fmt.Errorf(`Can't find reference "%s"`, refCommit)
+func (e errNoDiffBetweenReferences) Error() string {
+	return fmt.Sprintf(`Can't produce a diff between %s and %s, check your range is correct by running "git log %[1]s..%[2]s" command`, e.from, e.to)
 }
 
-// retrieveCommitPath fetch all commits between 2 references
-func retrieveCommitPath(from *object.Commit, to *object.Commit) (*[]*object.Commit, error) {
-	results := []*object.Commit{}
-	parents := []*object.Commit{}
-	fmt.Println(to)
-	err := to.Parents().ForEach(
-		func(c *object.Commit) error {
-			parents = append(parents, c)
-			return nil
-		})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if to.ID() == from.ID() {
-		results = append(results, to)
-
-		return &results, nil
-	}
-
-	for i := 0; i < to.NumParents(); i++ {
-		cs, err := retrieveCommitPath(from, parents[i])
-
-		if err != nil {
-			return nil, err
-		}
-
-		if len(*cs) > 0 {
-			results = append(results, to)
-			results = append(results, *cs...)
-
-			return &results, nil
-		}
-	}
-
-	return &results, nil
+// errRepositoryPath is triggered when repository path can't be opened
+type errRepositoryPath struct {
+	path string
 }
 
-// parseCommitHistory return commits between two intervals
-func parseCommitHistory(from *refSolver, to *refSolver) (*[]*object.Commit, error) {
-	results := []*object.Commit{}
-
-	commits, err := retrieveCommitPath(from.commitRef, to.commitRef)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < len(*commits)-1; i++ {
-		cs, errs := parseTree((*commits)[i], (*commits)[i+1])
-
-		if len(errs) > 0 {
-			return nil, fmt.Errorf("An error occurred when retrieving commits between %s and %s", from.commitRef.ID(), to.commitRef.ID())
-		}
-
-		results = append(results, cs...)
-	}
-
-	return &results, nil
+func (e errRepositoryPath) Error() string {
+	return fmt.Sprintf(`Check "%s" is an existing git repository path`, e.path)
 }
 
-// parseTree recursively parse a given tree to extract commits till boundary is reached
-func parseTree(commit *object.Commit, bound *object.Commit) ([]*object.Commit, []error) {
-	commits := []*object.Commit{}
-	errors := []error{}
-
-	if commit.ID() == bound.ID() || commit.NumParents() == 0 {
-		return commits, errors
-	}
-
-	commits = append(commits, commit)
-
-	parents := []*object.Commit{}
-
-	err := commit.Parents().ForEach(
-		func(c *object.Commit) error {
-			parents = append(parents, c)
-
-			return nil
-		})
-
-	if err != nil {
-		errors = append(errors, err)
-		return commits, errors
-	}
-
-	if len(parents) == 2 {
-		cs, errs := parseTree(parents[1], bound)
-		errors = append(errors, errs...)
-		commits = append(commits, cs...)
-	}
-
-	if len(parents) == 1 {
-		cs, errs := parseTree(parents[0], bound)
-		errors = append(errors, errs...)
-		commits = append(commits, cs...)
-	}
-
-	return commits, errors
+// errReferenceNotFound is triggered when reference can't be
+// found in git repository
+type errReferenceNotFound struct {
+	ref string
 }
+
+func (e errReferenceNotFound) Error() string {
+	return fmt.Sprintf(`Reference "%s" can't be found in git repository`, e.ref)
+}
+
+// errBrowsingTree is triggered when something wrong occurred during commit analysis process
+var errBrowsingTree = fmt.Errorf("An issue occurred during tree analysis")
 
 // FetchCommitInterval retrieves commit refSolver in a given interval for a repository
 func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*object.Commit, error) {
-	refRefSolverFrom := newParser(bytes.NewBufferString(from))
-	fromStmt, err := refRefSolverFrom.parseSymbolicReferencePath()
-	commits := []*object.Commit{}
+	fromCommit, err := resolveRef(from, repo)
 
 	if err != nil {
-		return &commits, err
+		return &[]*object.Commit{}, err
 	}
 
-	refRefSolverTo := newParser(bytes.NewBufferString(to))
-	toStmt, err := refRefSolverTo.parseSymbolicReferencePath()
+	toCommit, err := resolveRef(to, repo)
 
 	if err != nil {
-		return &commits, err
+		return &[]*object.Commit{}, err
 	}
 
-	fromRefSolver, err := newRefSolver(fromStmt, repo)
+	var ok bool
+
+	exclusionList, err := buildOriginCommitList(fromCommit)
 
 	if err != nil {
-		return &commits, err
+		return nil, err
 	}
 
-	toRefSolver, err := newRefSolver(toStmt, repo)
+	if _, ok = exclusionList[toCommit.ID().String()]; ok {
+		return nil, errNoDiffBetweenReferences{from, to}
+	}
+
+	commits, err := findDiffCommits(toCommit, &exclusionList)
 
 	if err != nil {
-		return &commits, err
+		return nil, err
 	}
 
-	return parseCommitHistory(fromRefSolver, toRefSolver)
+	if len(*commits) == 0 {
+		return nil, errNoDiffBetweenReferences{from, to}
+	}
+
+	return commits, nil
 }
 
 // FetchCommitByID retrieves a single commit from a repository
@@ -235,4 +91,79 @@ func FetchCommitByID(repo *git.Repository, ID string) (*object.Commit, error) {
 	hash := plumbing.NewHash(ID)
 
 	return repo.CommitObject(hash)
+}
+
+// resolveRef gives hash commit for a given string reference
+func resolveRef(refCommit string, repository *git.Repository) (*object.Commit, error) {
+	hash, err := repository.ResolveRevision(plumbing.Revision(refCommit))
+
+	if err == nil && !hash.IsZero() {
+		return repository.CommitObject(*hash)
+	}
+
+	return &object.Commit{}, errReferenceNotFound{refCommit}
+}
+
+// buildOriginCommitList browses git tree from a given commit
+// till root commit using kind of breadth first search algorithm
+// and grab commit ID to a map with ID as key
+func buildOriginCommitList(commit *object.Commit) (map[string]bool, error) {
+	queue := append([]*object.Commit{}, commit)
+	seen := map[string]bool{commit.ID().String(): true}
+
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = append([]*object.Commit{}, queue[1:]...)
+
+		err := current.Parents().ForEach(
+			func(c *object.Commit) error {
+				if _, ok := seen[c.ID().String()]; !ok {
+					seen[c.ID().String()] = true
+					queue = append(queue, c)
+				}
+
+				return nil
+			})
+
+		if err != nil && err.Error() != plumbing.ErrObjectNotFound.Error() {
+			return seen, errBrowsingTree
+		}
+	}
+
+	return seen, nil
+}
+
+// findDiffCommits extracts commits that are no part of a given commit list
+// using kind of depth first search algorithm to keep commits ordered
+func findDiffCommits(commit *object.Commit, exclusionList *map[string]bool) (*[]*object.Commit, error) {
+	commits := []*object.Commit{}
+	queue := append([]*node{}, &node{value: commit})
+	seen := map[string]bool{commit.ID().String(): true}
+	var current *node
+
+	for len(queue) > 0 {
+		current = queue[0]
+		queue = append([]*node{}, queue[1:]...)
+
+		if _, ok := (*exclusionList)[current.value.ID().String()]; !ok {
+			commits = append(commits, current.value)
+		}
+
+		err := current.value.Parents().ForEach(
+			func(c *object.Commit) error {
+				if _, ok := seen[c.ID().String()]; !ok {
+					seen[c.ID().String()] = true
+					n := &node{value: c, parent: current}
+					queue = append([]*node{n}, queue...)
+				}
+
+				return nil
+			})
+
+		if err != nil && err.Error() != plumbing.ErrObjectNotFound.Error() {
+			return &commits, errBrowsingTree
+		}
+	}
+
+	return &commits, nil
 }
