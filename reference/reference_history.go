@@ -25,15 +25,6 @@ func (e errNoDiffBetweenReferences) Error() string {
 	return fmt.Sprintf(`Can't produce a diff between %s and %s, check your range is correct by running "git log %[1]s..%[2]s" command`, e.from, e.to)
 }
 
-// errRepositoryPath is triggered when repository path can't be opened
-type errRepositoryPath struct {
-	path string
-}
-
-func (e errRepositoryPath) Error() string {
-	return fmt.Sprintf(`Check "%s" is an existing git repository path`, e.path)
-}
-
 // errReferenceNotFound is triggered when reference can't be
 // found in git repository
 type errReferenceNotFound struct {
