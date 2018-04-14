@@ -25,7 +25,11 @@ func newRefSolver(stmt *symbolicRefPathStmt, repo *git.Repository) (*refSolver, 
 		return nil, err
 	}
 
-	commitRef, _ := repo.Commit(hash)
+	commitRef, err := repo.CommitObject(hash)
+
+	if err != nil {
+		return nil, err
+	}
 
 	for _, path := range stmt.refPath {
 		parents := commitRef.Parents()
@@ -83,7 +87,7 @@ func resolveHash(refCommit string, repository *git.Repository) (plumbing.Hash, e
 
 	hash = plumbing.NewHash(refCommit)
 
-	_, err = repository.Commit(hash)
+	_, err = repository.CommitObject(hash)
 
 	if err == nil && !hash.IsZero() {
 		return hash, nil
@@ -230,5 +234,5 @@ func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*obje
 func FetchCommitByID(repo *git.Repository, ID string) (*object.Commit, error) {
 	hash := plumbing.NewHash(ID)
 
-	return repo.Commit(hash)
+	return repo.CommitObject(hash)
 }

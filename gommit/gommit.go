@@ -51,7 +51,7 @@ type Options struct {
 
 // fetchCommits retrieves all commits in repository between 2 commits references
 func fetchCommits(repoPath string, from string, to string) (*[]*object.Commit, error) {
-	repo, err := git.NewFilesystemRepository(repoPath + "/.git")
+	repo, err := git.PlainOpen(repoPath)
 
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func fetchCommits(repoPath string, from string, to string) (*[]*object.Commit, e
 
 // fetchCommit retrieve a single commit in repository from its ID
 func fetchCommit(repoPath string, ID string) (*object.Commit, error) {
-	repo, err := git.NewFilesystemRepository(repoPath + "/.git")
+	repo, err := git.PlainOpen(repoPath)
 
 	if err != nil {
 		return nil, err
