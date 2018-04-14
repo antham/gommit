@@ -231,13 +231,13 @@ func TestFetchCommitInterval(t *testing.T) {
 }
 
 func TestShallowCloneProducesNoErrors(t *testing.T) {
-	gitRepositoryPath := "shallow-repository-test"
-	cmd := exec.Command("rm", "-rf", gitRepositoryPath)
+	repositoryPath := "shallow-repository-test"
+	cmd := exec.Command("rm", "-rf", repositoryPath)
 	_, err := cmd.Output()
 
 	assert.NoError(t, err)
 
-	cmd = exec.Command("git", "clone", "--depth", "2", "https://github.com/octocat/Spoon-Knife.git", gitRepositoryPath)
+	cmd = exec.Command("git", "clone", "--depth", "2", "https://github.com/octocat/Spoon-Knife.git", repositoryPath)
 	_, err = cmd.Output()
 
 	assert.NoError(t, err)
@@ -249,7 +249,7 @@ func TestShallowCloneProducesNoErrors(t *testing.T) {
 		os.Exit(1)
 	}
 
-	repo, err := git.PlainOpen(path + "/" + gitRepositoryPath)
+	repo, err := git.PlainOpen(path + "/" + repositoryPath)
 
 	if err != nil {
 		logrus.Fatal(err)
