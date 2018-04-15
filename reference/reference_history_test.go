@@ -201,6 +201,27 @@ func TestFetchCommitInterval(t *testing.T) {
 		},
 		{
 			gitRepositoryPath,
+			getCommitFromRef("HEAD~4").ID().String(),
+			getCommitFromRef("test~2^2^2").ID().String(),
+			func(cs *[]*object.Commit, err error) {
+				assert.NoError(t, err)
+				assert.Len(t, *cs, 5)
+
+				commitTests := []string{
+					"feat(file6) : new file 6\n\ncreate a new file 6\n",
+					"feat(file5) : new file 5\n\ncreate a new file 5\n",
+					"feat(file4) : new file 4\n\ncreate a new file 4\n",
+					"feat(file3) : new file 3\n\ncreate a new file 3\n",
+					"feat(file2) : new file 2\n\ncreate a new file 2\n",
+				}
+
+				for i, c := range *cs {
+					assert.Equal(t, commitTests[i], c.Message)
+				}
+			},
+		},
+		{
+			gitRepositoryPath,
 			"whatever",
 			"HEAD~1",
 			func(cs *[]*object.Commit, err error) {
