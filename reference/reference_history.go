@@ -2,6 +2,8 @@ package reference
 
 import (
 	"fmt"
+	"io"
+	"regexp"
 
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -87,6 +89,32 @@ func FetchCommitByID(repo *git.Repository, ID string) (*object.Commit, error) {
 // resolveRef gives hash commit for a given string reference
 func resolveRef(refCommit string, repository *git.Repository) (*object.Commit, error) {
 	hash, err := repository.ResolveRevision(plumbing.Revision(refCommit))
+
+	if (err != nil || hash.IsZero()) && regexp.MustCompile("[0-9a-f]{40}").MatchString(refCommit) {
+		i, cErr := repository.CommitObjects()
+
+		if cErr != nil {
+			return nil, errReferenceNotFound{refCommit}
+		}
+
+		var c *object.Commit
+
+		cErr = i.ForEach(func(o *object.Commit) error {
+			if o.ID().String() == refCommit {
+				c = o
+
+				return io.EOF
+			}
+
+			return nil
+		})
+
+		if cErr != nil && cErr != io.EOF {
+			return nil, errReferenceNotFound{refCommit}
+		}
+
+		return c, nil
+	}
 
 	if err == nil && !hash.IsZero() {
 		return repository.CommitObject(*hash)
