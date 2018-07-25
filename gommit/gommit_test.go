@@ -70,51 +70,51 @@ func TestMessageDoesntMatchTemplate(t *testing.T) {
 	assert.False(t, match, "Message must not match template")
 }
 
-func TestMatchRangeCommitQuery(t *testing.T) {
+func TestMatchRangeQuery(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := RangeCommitQuery{
-		"testing-repository/",
-		"test~2",
-		"test",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+	q := RangeQuery{
+		Path:     "testing-repository/",
+		From:     "test~2",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 0, "Must return no items, match was successful for every commit")
 }
 
-func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
+func TestMatchRangeQueryrWithAMessageErrorCommit(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := RangeCommitQuery{
-		"testing-repository/",
-		"test~2",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+	q := RangeQuery{
+		Path:     "testing-repository/",
+		From:     "test~2",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 2, "Must return two items")
@@ -123,7 +123,7 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
+func TestMatchRangeQueryASummaryErrorCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/bad-summary-message-commit.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -132,19 +132,19 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 		}
 	}
 
-	q := RangeCommitQuery{
-		"testing-repository/",
-		"test~1",
-		"test",
-		map[string]string{"simple": ".*\n"},
-		Options{
+	q := RangeQuery{
+		Path:     "testing-repository/",
+		From:     "test~1",
+		To:       "test",
+		Matchers: map[string]string{"simple": ".*\n"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
@@ -153,7 +153,7 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 	assert.EqualError(t, (*m)[0].SummaryError, "Commit summary length is greater than 50 characters", "Must contains summary message error")
 }
 
-func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
+func TestMatchRangeWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -162,19 +162,19 @@ func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T)
 		}
 	}
 
-	q := RangeCommitQuery{
-		"testing-repository/",
-		"test^^^^",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+	q := RangeQuery{
+		Path:     "testing-repository/",
+		From:     "test^^^^",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: true,
 			SummaryLength:       50,
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 7)
@@ -185,7 +185,7 @@ func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T)
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
+func TestMatchRangeQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -194,19 +194,19 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 		}
 	}
 
-	q := RangeCommitQuery{
-		"testing-repository/",
-		"test^^^^",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+	q := RangeQuery{
+		Path:     "testing-repository/",
+		From:     "test^^^^",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 9, "Must return two itesm")
@@ -214,26 +214,26 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
+func TestMatchRangeWithAnUnexistingCommitRange(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := RangeCommitQuery{
-		"testing-repository/",
-		"test~15",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+	q := RangeQuery{
+		Path:     "testing-repository/",
+		From:     "test~15",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.EqualError(t, err, "Reference \"test~15\" can't be found in git repository")
 	assert.Len(t, *m, 0, "Must return no item")
@@ -247,9 +247,9 @@ func TestMatchMessageQuery(t *testing.T) {
 	}
 
 	q := MessageQuery{
-		"update(file) : fix",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		Options{
+		Message:  "update(file) : fix",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 		},
@@ -269,9 +269,9 @@ func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 	}
 
 	q := MessageQuery{
-		"update(file) :",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		Options{
+		Message:  "update(file) :",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -294,9 +294,9 @@ func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 	}
 
 	q := MessageQuery{
-		"update(file) : test test test test test test test test test test test test test test",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		Options{
+		Message:  "update(file) : test test test test test test test test test test test test test test",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -328,10 +328,10 @@ func TestMatchCommitQuery(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"testing-repository/",
-		string(ID[:len(ID)-1]),
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+		Path:     "testing-repository/",
+		ID:       string(ID[:len(ID)-1]),
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -361,10 +361,10 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	}
 
 	q := CommitQuery{
-		"testing-repository/",
-		string(ID[:len(ID)-1]),
-		map[string]string{"simple": "whatever"},
-		Options{
+		Path:     "testing-repository/",
+		ID:       string(ID[:len(ID)-1]),
+		Matchers: map[string]string{"simple": "whatever"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -397,10 +397,10 @@ func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"testtestest/",
-		string(ID[:len(ID)-1]),
-		map[string]string{"simple": "whatever"},
-		Options{
+		Path:     "testtestest/",
+		ID:       string(ID[:len(ID)-1]),
+		Matchers: map[string]string{"simple": "whatever"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -420,10 +420,10 @@ func TestMatchCommitQueryWithAnUnexistingCommit(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"testing-repository/",
-		"4e1243bd22c66e76c2ba9eddc1f91394e57f9f83",
-		map[string]string{"simple": "whatever"},
-		Options{
+		Path:     "testing-repository/",
+		ID:       "4e1243bd22c66e76c2ba9eddc1f91394e57f9f83",
+		Matchers: map[string]string{"simple": "whatever"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
