@@ -70,14 +70,14 @@ func TestMessageDoesntMatchTemplate(t *testing.T) {
 	assert.False(t, match, "Message must not match template")
 }
 
-func TestMatchRangeCommitQuery(t *testing.T) {
+func TestMatchRangeQuery(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := RangeCommitQuery{
+	q := RangeQuery{
 		"testing-repository/",
 		"test~2",
 		"test",
@@ -89,20 +89,20 @@ func TestMatchRangeCommitQuery(t *testing.T) {
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 0, "Must return no items, match was successful for every commit")
 }
 
-func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
+func TestMatchRangeQueryrWithAMessageErrorCommit(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := RangeCommitQuery{
+	q := RangeQuery{
 		"testing-repository/",
 		"test~2",
 		"test",
@@ -114,7 +114,7 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 2, "Must return two items")
@@ -123,7 +123,7 @@ func TestMatchRangeCommitQueryrWithAMessageErrorCommit(t *testing.T) {
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
+func TestMatchRangeQueryASummaryErrorCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/bad-summary-message-commit.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -132,7 +132,7 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 		}
 	}
 
-	q := RangeCommitQuery{
+	q := RangeQuery{
 		"testing-repository/",
 		"test~1",
 		"test",
@@ -144,7 +144,7 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 1, "Must return one item")
@@ -153,7 +153,7 @@ func TestMatchRangeCommitQueryASummaryErrorCommit(t *testing.T) {
 	assert.EqualError(t, (*m)[0].SummaryError, "Commit summary length is greater than 50 characters", "Must contains summary message error")
 }
 
-func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
+func TestMatchRangeWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -162,7 +162,7 @@ func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T)
 		}
 	}
 
-	q := RangeCommitQuery{
+	q := RangeQuery{
 		"testing-repository/",
 		"test^^^^",
 		"test",
@@ -174,7 +174,7 @@ func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T)
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 7)
@@ -185,7 +185,7 @@ func TestMatchRangeCommitWithAMessageErrorCommitWithoutMergeCommit(t *testing.T)
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
+func TestMatchRangeQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -194,7 +194,7 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 		}
 	}
 
-	q := RangeCommitQuery{
+	q := RangeQuery{
 		"testing-repository/",
 		"test^^^^",
 		"test",
@@ -206,7 +206,7 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 9, "Must return two itesm")
@@ -214,14 +214,14 @@ func TestMatchRangeCommitQueryWithAMessageErrorCommitWithMergeCommits(t *testing
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
+func TestMatchRangeWithAnUnexistingCommitRange(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	q := RangeCommitQuery{
+	q := RangeQuery{
 		"testing-repository/",
 		"test~15",
 		"test",
@@ -233,7 +233,7 @@ func TestMatchRangeCommitWithAnUnexistingCommitRange(t *testing.T) {
 		},
 	}
 
-	m, err := MatchRangeCommitQuery(q)
+	m, err := MatchRangeQuery(q)
 
 	assert.EqualError(t, err, "Reference \"test~15\" can't be found in git repository")
 	assert.Len(t, *m, 0, "Must return no item")

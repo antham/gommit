@@ -26,8 +26,8 @@ type CommitQuery struct {
 	Options  Options
 }
 
-// RangeCommitQuery to retrieves commits and do checking
-type RangeCommitQuery struct {
+// RangeQuery to retrieves commits and do checking
+type RangeQuery struct {
 	Path     string
 	From     string
 	To       string
@@ -179,8 +179,8 @@ func MatchCommitQuery(query CommitQuery) (*Matching, error) {
 	return analyzeCommit(commit, query.Matchers, query.Options), nil
 }
 
-// MatchRangeCommitQuery triggers regexp matching against a range of commit messages
-func MatchRangeCommitQuery(query RangeCommitQuery) (*[]*Matching, error) {
+// MatchRangeQuery triggers regexp matching against a range of commit messages
+func MatchRangeQuery(query RangeQuery) (*[]*Matching, error) {
 	commits, err := fetchCommits(query.Path, query.From, query.To)
 
 	if err != nil {

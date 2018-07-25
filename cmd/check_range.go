@@ -9,10 +9,10 @@ import (
 	"github.com/antham/gommit/gommit"
 )
 
-// checkRangeCommitCmd represents the check command
-var checkRangeCommitCmd = &cobra.Command{
-	Use:   "range [commitFrom] [commitTo] [&path]",
-	Short: "Check messages in commit range",
+// checkRangeCmd represents the check command
+var checkRangeCmd = &cobra.Command{
+	Use:   "range [revisionfrom] [revisionTo] [&path]",
+	Short: "Check messages in range",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := validateFileConfig()
 
@@ -22,7 +22,7 @@ var checkRangeCommitCmd = &cobra.Command{
 			exitError()
 		}
 
-		from, to, path, err := extractCheckRangeCommitArgs(args)
+		from, to, path, err := extractCheckRangeArgs(args)
 
 		if err != nil {
 			failure(err)
@@ -30,7 +30,7 @@ var checkRangeCommitCmd = &cobra.Command{
 			exitError()
 		}
 
-		q := gommit.RangeCommitQuery{
+		q := gommit.RangeQuery{
 			Path:     path,
 			From:     from,
 			To:       to,
@@ -38,13 +38,13 @@ var checkRangeCommitCmd = &cobra.Command{
 			Options:  buildOptions(),
 		}
 
-		matchings, err := gommit.MatchRangeCommitQuery(q)
+		matchings, err := gommit.MatchRangeQuery(q)
 
 		processMatchResult(matchings, err, viper.GetStringMapString("examples"))
 	},
 }
 
-func extractCheckRangeCommitArgs(args []string) (string, string, string, error) {
+func extractCheckRangeArgs(args []string) (string, string, string, error) {
 	if len(args) < 2 {
 		return "", "", "", fmt.Errorf("Two arguments required : origin commit and end commit")
 
@@ -71,5 +71,5 @@ func extractCheckRangeCommitArgs(args []string) (string, string, string, error) 
 }
 
 func init() {
-	checkCmd.AddCommand(checkRangeCommitCmd)
+	checkCmd.AddCommand(checkRangeCmd)
 }

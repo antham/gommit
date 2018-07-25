@@ -13,7 +13,7 @@ import (
 	"github.com/antham/gommit/gommit"
 )
 
-func TestCheckRangeCommitWithErrors(t *testing.T) {
+func TestCheckRangeWithErrors(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
 
 	if err != nil {
@@ -144,7 +144,7 @@ func TestCheckRangeCommitWithErrors(t *testing.T) {
 	}
 }
 
-func TestCheckRangeCommitWithBadCommitMessage(t *testing.T) {
+func TestCheckRangeWithBadCommitMessage(t *testing.T) {
 	path, err := os.Getwd()
 
 	if err != nil {
@@ -204,7 +204,7 @@ func TestCheckRangeCommitWithBadCommitMessage(t *testing.T) {
 	assert.Len(t, examples, 3, "Must return 3 examples")
 }
 
-func TestCheckRangeCommitWithNoErrors(t *testing.T) {
+func TestCheckRangeWithNoErrors(t *testing.T) {
 	path, err := os.Getwd()
 
 	if err != nil {

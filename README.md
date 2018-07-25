@@ -160,10 +160,10 @@ Check a message, useful for script for instance when you want to use it with git
 #### check range
 
 ```bash
-Check messages in commit range
+Check messages in range
 
 Usage:
-  gommit check range [commitFrom] [commitTo] [&path] [flags]
+  gommit check range [revisionfrom] [revisionTo] [&path] [flags]
 
 Flags:
   -h, --help   help for range
