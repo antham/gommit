@@ -121,17 +121,56 @@ You need to provide two commit references to run matching for instance :
 
 #### check commit
 
+```bash
+Check commit message
+
+Usage:
+  gommit check commit [id] [&path] [flags]
+
+Flags:
+  -h, --help   help for commit
+
+Global Flags:
+      --config string    (default ".gommit.toml")
+```
+
 Check one comit from its commit ID, doesn't support short ID currently :
 
 ```gommit check commit aeb603ba83614fae682337bdce9ee1bad1da6d6e```
 
 #### check message
 
+```bash
+Check message
+
+Usage:
+  gommit check message [message] [flags]
+
+Flags:
+  -h, --help   help for message
+
+Global Flags:
+      --config string    (default ".gommit.toml")
+```
+
 Check a message, useful for script for instance when you want to use it with git hooks :
 
 ```gommit check message "Hello"```
 
 #### check range
+
+```bash
+Check messages in commit range
+
+Usage:
+  gommit check range [commitFrom] [commitTo] [&path] [flags]
+
+Flags:
+  -h, --help   help for range
+
+Global Flags:
+      --config string    (default ".gommit.toml")
+```
 
 Check a commit range, useful if you want to use it with a CI to ensure all commits in branch are following your conventions :
 
@@ -210,11 +249,11 @@ First, we download the binary from the release page according to the version we 
 
 And we can run gommit against master for instance :
 
-```
+```yaml
 - run:
     name: Run gommit
     command: |
-      ~/bin/gommit check range $(git rev-parse origin/master) $(git rev-parse ${CIRCLE_BRANCH})
+      if [ $CIRCLE_BRANCH != 'master' ]; then ~/bin/gommit check range $(git rev-parse origin/master) $CIRCLE_BRANCH ; fi
 ```
 
 ## Third Part Libraries
