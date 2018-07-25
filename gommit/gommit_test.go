@@ -123,7 +123,7 @@ func TestMatchRangeQueryrWithAMessageErrorCommit(t *testing.T) {
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
-func TestMatchRangeQueryASummaryErrorCommit(t *testing.T) {
+func TestMatchRangeQueryWithASummaryErrorCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/bad-summary-message-commit.sh"} {
 		err := exec.Command(filename).Run()
 
@@ -236,6 +236,31 @@ func TestMatchRangeWithAnUnexistingCommitRange(t *testing.T) {
 	m, err := MatchRangeQuery(q)
 
 	assert.EqualError(t, err, "Reference \"test~15\" can't be found in git repository")
+	assert.Len(t, *m, 0, "Must return no item")
+}
+
+func TestMatchRangeWithNoCommitsInCommitRange(t *testing.T) {
+	err := exec.Command("../features/repo.sh").Run()
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	q := RangeQuery{
+		Path:     "testing-repository/",
+		From:     "test",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
+			CheckSummaryLength:  false,
+			ExcludeMergeCommits: false,
+			SummaryLength:       50,
+		},
+	}
+
+	m, err := MatchRangeQuery(q)
+
+	assert.EqualError(t, err, `Can't produce a diff between test and test, check your range is correct by running "git log test..test" command`)
 	assert.Len(t, *m, 0, "Must return no item")
 }
 

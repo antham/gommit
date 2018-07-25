@@ -172,8 +172,6 @@ func MatchCommitQuery(query CommitQuery) (*Matching, error) {
 
 	if err != nil {
 		return &Matching{}, err
-	} else if commit == nil {
-		return &Matching{}, fmt.Errorf(`No commits found between with ID : "%s"`, query.ID)
 	}
 
 	return analyzeCommit(commit, query.Matchers, query.Options), nil
@@ -185,8 +183,6 @@ func MatchRangeQuery(query RangeQuery) (*[]*Matching, error) {
 
 	if err != nil {
 		return &[]*Matching{}, err
-	} else if len(*commits) == 0 {
-		return &[]*Matching{}, fmt.Errorf(`No commits found between "%s" and "%s"`, query.From, query.To)
 	}
 
 	return analyzeCommits(commits, query.Matchers, query.Options), nil
