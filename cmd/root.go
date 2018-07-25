@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"errors"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -39,7 +37,6 @@ func initConfig() {
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
-		failure(errors.New("Can't read config file " + cfgFile))
 		failure(err)
 		exitError()
 	}

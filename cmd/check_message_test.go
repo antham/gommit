@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"sync"
@@ -42,6 +41,10 @@ func TestCheckMessageWithErrors(t *testing.T) {
 		{
 			"check",
 			"message",
+		},
+		{
+			"check",
+			"message",
 			"test",
 		},
 		{
@@ -51,13 +54,15 @@ func TestCheckMessageWithErrors(t *testing.T) {
 		},
 	}
 
-	errors := []error{
-		fmt.Errorf("One argument required : message"),
-		fmt.Errorf(`At least one matcher must be defined`),
-		fmt.Errorf(`At least one example must be defined`),
+	errorStrings := []string{
+		"open .*: no such file or directory",
+		"One argument required : message",
+		`At least one matcher must be defined`,
+		`At least one example must be defined`,
 	}
 
 	configs := []string{
+		path + "/test.toml",
 		path + "/../features/.gommit.toml",
 		path + "/../features/.gommit-no-matchers.toml",
 		path + "/../features/.gommit-no-examples.toml",
@@ -86,7 +91,7 @@ func TestCheckMessageWithErrors(t *testing.T) {
 		w.Wait()
 
 		assert.Error(t, errc, "Must return an error")
-		assert.EqualError(t, errc, errors[i].Error(), "Must return an error : "+errors[i].Error())
+		assert.Regexp(t, errorStrings[i], errc.Error())
 	}
 }
 
