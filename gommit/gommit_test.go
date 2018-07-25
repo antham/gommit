@@ -78,11 +78,11 @@ func TestMatchRangeQuery(t *testing.T) {
 	}
 
 	q := RangeQuery{
-		"testing-repository/",
-		"test~2",
-		"test",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+		Path:     "testing-repository/",
+		From:     "test~2",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -103,11 +103,11 @@ func TestMatchRangeQueryrWithAMessageErrorCommit(t *testing.T) {
 	}
 
 	q := RangeQuery{
-		"testing-repository/",
-		"test~2",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+		Path:     "testing-repository/",
+		From:     "test~2",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -133,11 +133,11 @@ func TestMatchRangeQueryASummaryErrorCommit(t *testing.T) {
 	}
 
 	q := RangeQuery{
-		"testing-repository/",
-		"test~1",
-		"test",
-		map[string]string{"simple": ".*\n"},
-		Options{
+		Path:     "testing-repository/",
+		From:     "test~1",
+		To:       "test",
+		Matchers: map[string]string{"simple": ".*\n"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -163,11 +163,11 @@ func TestMatchRangeWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
 	}
 
 	q := RangeQuery{
-		"testing-repository/",
-		"test^^^^",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+		Path:     "testing-repository/",
+		From:     "test^^^^",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: true,
 			SummaryLength:       50,
@@ -195,11 +195,11 @@ func TestMatchRangeQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 	}
 
 	q := RangeQuery{
-		"testing-repository/",
-		"test^^^^",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+		Path:     "testing-repository/",
+		From:     "test^^^^",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -222,11 +222,11 @@ func TestMatchRangeWithAnUnexistingCommitRange(t *testing.T) {
 	}
 
 	q := RangeQuery{
-		"testing-repository/",
-		"test~15",
-		"test",
-		map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+		Path:     "testing-repository/",
+		From:     "test~15",
+		To:       "test",
+		Matchers: map[string]string{"simple": "(?:update)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -247,9 +247,9 @@ func TestMatchMessageQuery(t *testing.T) {
 	}
 
 	q := MessageQuery{
-		"update(file) : fix",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		Options{
+		Message:  "update(file) : fix",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 		},
@@ -269,9 +269,9 @@ func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 	}
 
 	q := MessageQuery{
-		"update(file) :",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		Options{
+		Message:  "update(file) :",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		Options: Options{
 			CheckSummaryLength:  false,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -294,9 +294,9 @@ func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 	}
 
 	q := MessageQuery{
-		"update(file) : test test test test test test test test test test test test test test",
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
-		Options{
+		Message:  "update(file) : test test test test test test test test test test test test test test",
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -328,10 +328,10 @@ func TestMatchCommitQuery(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"testing-repository/",
-		string(ID[:len(ID)-1]),
-		map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
-		Options{
+		Path:     "testing-repository/",
+		ID:       string(ID[:len(ID)-1]),
+		Matchers: map[string]string{"simple": "(?:update|feat)\\(.*?\\) : .*?\\n\\n.*?\\n"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -361,10 +361,10 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	}
 
 	q := CommitQuery{
-		"testing-repository/",
-		string(ID[:len(ID)-1]),
-		map[string]string{"simple": "whatever"},
-		Options{
+		Path:     "testing-repository/",
+		ID:       string(ID[:len(ID)-1]),
+		Matchers: map[string]string{"simple": "whatever"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -397,10 +397,10 @@ func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"testtestest/",
-		string(ID[:len(ID)-1]),
-		map[string]string{"simple": "whatever"},
-		Options{
+		Path:     "testtestest/",
+		ID:       string(ID[:len(ID)-1]),
+		Matchers: map[string]string{"simple": "whatever"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
@@ -420,10 +420,10 @@ func TestMatchCommitQueryWithAnUnexistingCommit(t *testing.T) {
 	}
 
 	q := CommitQuery{
-		"testing-repository/",
-		"4e1243bd22c66e76c2ba9eddc1f91394e57f9f83",
-		map[string]string{"simple": "whatever"},
-		Options{
+		Path:     "testing-repository/",
+		ID:       "4e1243bd22c66e76c2ba9eddc1f91394e57f9f83",
+		Matchers: map[string]string{"simple": "whatever"},
+		Options: Options{
 			CheckSummaryLength:  true,
 			ExcludeMergeCommits: false,
 			SummaryLength:       50,
