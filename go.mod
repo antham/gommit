@@ -13,7 +13,7 @@ require (
 	github.com/kevinburke/ssh_config v0.0.0-20180317175531-9fc7bb800b55
 	github.com/magiconair/properties v1.8.0
 	github.com/mattn/go-colorable v0.0.9
-	github.com/mattn/go-isatty v0.0.3
+	github.com/mattn/go-isatty v0.0.6
 	github.com/mitchellh/go-homedir v0.0.0-20161203194507-b8bc1bf76747
 	github.com/mitchellh/mapstructure v0.0.0-20171017171808-06020f85339e
 	github.com/pelletier/go-buffruneio v0.2.0
