@@ -27,7 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.0
 	github.com/spf13/viper v1.3.1
 	github.com/src-d/gcfg v1.3.0
-	github.com/stretchr/testify v1.1.4
+	github.com/stretchr/testify v1.3.0
 	github.com/xanzy/ssh-agent v0.1.0
 	golang.org/x/crypto v0.0.0-20171113213409-9f005a07e0d3
 	golang.org/x/net v0.0.0-20180406214816-61147c48b25b
