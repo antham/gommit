@@ -33,7 +33,7 @@ require (
 	golang.org/x/net v0.0.0-20180406214816-61147c48b25b
 	golang.org/x/sys v0.0.0-20171114162044-bf42f188b9bc
 	golang.org/x/text v0.0.0-20171102192421-88f656faf3f3
-	gopkg.in/src-d/go-billy.v4 v4.1.1
+	gopkg.in/src-d/go-billy.v4 v4.3.0
 	gopkg.in/src-d/go-git.v4 v4.3.0
 	gopkg.in/warnings.v0 v0.1.2
 	gopkg.in/yaml.v2 v2.0.0-20170812160011-eb3733d160e7
