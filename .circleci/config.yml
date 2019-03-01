@@ -14,11 +14,6 @@ jobs:
             mkdir /home/circleci/bin
             wget -O ~/bin/gommit https://github.com/antham/gommit/releases/download/v2.1.3/gommit_linux_386 && chmod 777 ~/bin/gommit
       - run:
-          name: Install gometalinter
-          command: |
-            go get github.com/alecthomas/gometalinter
-            gometalinter --install --update
-      - run:
           name: Install vendors
           command: |
             export GO111MODULE=on
