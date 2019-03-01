@@ -12,16 +12,13 @@ compile:
 fmt:
 	find ! -path "./vendor/*" -name "*.go" -exec gofmt -s -w {} \;
 
-gometalinter:
-	gometalinter -D gotype --vendor --deadline=240s --dupl-threshold=200 -e '_string' -j 5 ./...
-
 run-tests:
 	./test.sh
 
 run-quick-tests:
 	go test -v $(shell glide nv)
 
-test-all: gometalinter run-tests
+test-all: run-tests
 
 test-package:
 	go test -race -cover -coverprofile=/tmp/gommit github.com/antham/gommit/$(pkg)
