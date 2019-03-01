@@ -28,10 +28,3 @@ func TestParseDirectoryWithErrors(t *testing.T) {
 
 	assert.EqualError(t, err, `"/tmp/file" must be a directory`)
 }
-
-func TestParseDirectorydWithErrors(t *testing.T) {
-	path, err := parseDirectory("")
-
-	assert.NoError(t, err)
-	assert.Contains(t, path, "antham/gommit")
-}
