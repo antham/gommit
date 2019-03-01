@@ -17,7 +17,7 @@ require (
 	github.com/mitchellh/go-homedir v0.0.0-20161203194507-b8bc1bf76747
 	github.com/mitchellh/mapstructure v0.0.0-20171017171808-06020f85339e
 	github.com/pelletier/go-buffruneio v0.2.0
-	github.com/pelletier/go-toml v1.0.1
+	github.com/pelletier/go-toml v1.2.0
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/sergi/go-diff v1.0.0
 	github.com/spf13/afero v1.0.0
