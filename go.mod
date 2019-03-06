@@ -5,7 +5,7 @@ require (
 	github.com/davecgh/go-spew v1.1.0
 	github.com/dlclark/regexp2 v1.1.6
 	github.com/emirpasic/gods v1.12.0
-	github.com/fatih/color v1.5.0
+	github.com/fatih/color v1.7.0
 	github.com/fsnotify/fsnotify v1.4.2
 	github.com/hashicorp/hcl v0.0.0-20171017181929-23c074d0eceb
 	github.com/inconshreveable/mousetrap v1.0.0
