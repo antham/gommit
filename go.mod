@@ -2,7 +2,7 @@ module github.com/antham/gommit
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
-	github.com/dlclark/regexp2 v1.1.6
+	github.com/dlclark/regexp2 v1.1.8
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fatih/color v1.7.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
