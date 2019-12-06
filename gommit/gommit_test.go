@@ -6,38 +6,67 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
-func TestFetchCommitsWithValidInterval(t *testing.T) {
-	err := exec.Command("../features/repo.sh").Run()
-
-	if err != nil {
-		logrus.Fatal(err)
+func TestFetchCommits(t *testing.T) {
+	type scenario struct {
+		name      string
+		arguments func() (repoPath string, from string, to string)
+		test      func(*[]*object.Commit, error)
 	}
 
-	commits, err := fetchCommits("testing-repository", "test~2", "test")
-	assert.NoError(t, err, "Must return no errors")
+	scenarios := []scenario{
+		{
+			"Fetch valid interval",
+			func() (string, string, string) {
+				return "testing-repository", "test~2", "test"
+			},
+			func(commits *[]*object.Commit, err error) {
+				assert.NoError(t, err)
+				assert.Len(t, *commits, 2)
 
-	expected := []string{
-		"feat(file8) : new file 8\n\ncreate a new file 8\n",
-		"feat(file7) : new file 7\n\ncreate a new file 7\n",
+				expected := []string{
+					"feat(file8) : new file 8\n\ncreate a new file 8\n",
+					"feat(file7) : new file 7\n\ncreate a new file 7\n",
+				}
+
+				for i, c := range *commits {
+					assert.Equal(t, expected[i], c.Message)
+				}
+			},
+		},
+		{
+			"Fetch wrong repository",
+			func() (string, string, string) {
+				return "testtesttest", "4906f72818c0185162a3ec9c39a711d7c2842d40", "test"
+			},
+			func(commits *[]*object.Commit, err error) {
+				assert.Error(t, err)
+				assert.EqualError(t, err, "repository does not exist")
+				assert.Nil(t, commits)
+			},
+		},
+		{
+			"Fetch with wrong interval",
+			func() (string, string, string) {
+				return "testing-repository", "4906f72818c0185162a3ec9c39a711d7c2842d40", "maste"
+			},
+			func(commits *[]*object.Commit, err error) {
+				assert.Error(t, err)
+				assert.EqualError(t, err, `Reference "maste" can't be found in git repository`)
+				assert.Nil(t, commits)
+			},
+		},
 	}
 
-	assert.Len(t, *commits, 2, "Must contains 2 commits")
-
-	for i, c := range *commits {
-		assert.Equal(t, expected[i], c.Message, "Wrong commit fetched from repository")
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			assert.NoError(t, exec.Command("../features/repo.sh").Run())
+			s.test(fetchCommits(s.arguments()))
+			assert.NoError(t, exec.Command("../features/repo-teardown.sh").Run())
+		})
 	}
-}
-
-func TestFetchCommitsWithWrongRepository(t *testing.T) {
-	_, err := fetchCommits("testtesttest", "4906f72818c0185162a3ec9c39a711d7c2842d40", "test")
-	assert.Error(t, err, "Must return an error")
-}
-
-func TestFetchCommitsWithWrongInterval(t *testing.T) {
-	_, err := fetchCommits("testing-repository", "4906f72818c0185162a3ec9c39a711d7c2842d40", "maste")
-	assert.Error(t, err, "Must return an error")
 }
 
 func TestMessageMatchTemplate1(t *testing.T) {

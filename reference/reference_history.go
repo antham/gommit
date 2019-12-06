@@ -43,21 +43,18 @@ var errBrowsingTree = fmt.Errorf("An issue occurred during tree analysis")
 // FetchCommitInterval retrieves commit refSolver in a given interval for a repository
 func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*object.Commit, error) {
 	fromCommit, err := resolveRef(from, repo)
-
 	if err != nil {
-		return &[]*object.Commit{}, err
+		return nil, err
 	}
 
 	toCommit, err := resolveRef(to, repo)
-
 	if err != nil {
-		return &[]*object.Commit{}, err
+		return nil, err
 	}
 
 	var ok bool
 
 	exclusionList, err := buildOriginCommitList(fromCommit)
-
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +64,6 @@ func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*obje
 	}
 
 	commits, err := findDiffCommits(toCommit, &exclusionList)
-
 	if err != nil {
 		return nil, err
 	}
