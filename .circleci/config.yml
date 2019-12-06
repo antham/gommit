@@ -51,7 +51,7 @@ jobs:
             mkdir /home/circleci/bin
             wget -O ~/bin/chyle https://github.com/antham/chyle/releases/download/v1.2.0/chyle_linux_amd64
             chmod 777 ~/bin/chyle
-            curl -sL https://github.com/goreleaser/goreleaser/releases/download/v0.123.3/goreleaser_Linux_x86_64.tar.gz|tar -C /usr/local/bin/  -xzv goreleaser
+            curl -sL https://github.com/goreleaser/goreleaser/releases/download/v0.123.3/goreleaser_Linux_x86_64.tar.gz|sudo tar -C /usr/local/bin/  -xzv goreleaser
       - run:
           name: Install vendors
           command: |
