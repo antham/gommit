@@ -18,6 +18,11 @@ jobs:
           name: Install vendors
           command: |
             export GO111MODULE=on
+            go mod download
+      - run:
+          name: Check go mod tidy doesn't produce diff
+          command: |
+            test $(go mod tidy -v 2>&1|wc -l) -eq 0 || exit 1
       - run:
           name: Compile
           command: |
