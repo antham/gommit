@@ -17,6 +17,12 @@ builds:
       - arm64
     env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X gommit.appVersion={{.Version}}
+brews:
+  - github:
+     owner: antham
+     name: gommit-homebrew-tap
 checksum:
   name_template: 'checksums.txt'
 snapshot:
