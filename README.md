@@ -44,7 +44,7 @@ an_extended_commit="""
 
 #### Config
 
-* ```exclude-merge-commits``` : if set to true, will not check commit mesage for merge commit
+* ```exclude-merge-commits``` : if set to true, will not check commit message for merge commit
 * ```check-summary-length``` : if set to true, check commit summary length, default is 50 characters
 * ```summary-length``` : you can override the default value summary length, which is 50 characters, this config is used only if check-summary-length is true
 
