@@ -1,4 +1,5 @@
-Gommit [![CircleCI](https://circleci.com/gh/antham/gommit/tree/master.svg?style=svg)](https://circleci.com/gh/antham/gommit/tree/master) [![codecov](https://codecov.io/gh/antham/gommit/branch/master/graph/badge.svg)](https://codecov.io/gh/antham/gommit) [![codebeat badge](https://codebeat.co/badges/cc515300-053e-4b62-8184-645be6e6aa2f)](https://codebeat.co/projects/github-com-antham-gommit) [![Go Report Card](https://goreportcard.com/badge/github.com/antham/gommit)](https://goreportcard.com/report/github.com/antham/gommit) [![GoDoc](https://godoc.org/github.com/antham/gommit?status.svg)](http://godoc.org/github.com/antham/gommit) [![GitHub tag](https://img.shields.io/github/tag/antham/gommit.svg)]()
+Gommit [![CircleCI](https://circleci.com/gh/antham/gommit/tree/master.svg?style=svg)](https://circleci.com/gh/antham/gommit/tree/master) [![codecov](https://codecov.io/gh/antham/gommit/branch/master/graph/badge.svg)](https://codecov.io/gh/antham/gommit) [![codebeat badge](https://codebeat.co/badges/cc515300-053e-4b62-8184-645be6e6aa2f)](https://codebeat.co/projects/github-com-antham-gommit) [![Go Report Card](https://goreportcard.com/badge/github.com/antham/gommit)](https://goreportcard.com/report/github.com/antham/gommit) [![GoDoc](https://godoc.org/github.com/antham/gommit?status.svg)](http://godoc.org/github.com/antham/gommit) [![GitHub tag](https://img.shields.io/github/tag/antham/gommit.svg)][![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fantham%2Fgommit.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fantham%2Fgommit?ref=badge_shield)
+()
 ======
 
 Gommit analyze commits messages to ensure they follow defined pattern.
@@ -261,3 +262,7 @@ And we can run gommit against master for instance :
 ### Nodejs
 
 * [gommitjs](https://github.com/dschnare/gommitjs) : A Nodejs wrapper for gommit
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fantham%2Fgommit.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fantham%2Fgommit?ref=badge_large)
