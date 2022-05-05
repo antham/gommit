@@ -11,4 +11,4 @@ builds:
     goarch:
       - amd64
     ldflags:
-      - -X 'github.com/antham/gommit/cmd.appVersion={{.Version}}'
+      - -X 'github.com/antham/gommit/gommit.appVersion={{.Version}}'
