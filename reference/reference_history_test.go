@@ -132,15 +132,12 @@ func TestResolveRefWithErrors(t *testing.T) {
 
 func TestFetchCommitInterval(t *testing.T) {
 	type g struct {
-		path    string
 		toRef   string
 		fromRef string
 		f       func(*[]*object.Commit, error)
 	}
-
 	tests := []g{
 		{
-			gitRepositoryPath,
 			"HEAD",
 			"test",
 			func(cs *[]*object.Commit, err error) {
@@ -149,7 +146,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 		{
-			gitRepositoryPath,
 			"HEAD~1",
 			"HEAD~3",
 			func(cs *[]*object.Commit, err error) {
@@ -158,7 +154,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 		{
-			gitRepositoryPath,
 			"HEAD~3",
 			"test~2^2",
 			func(cs *[]*object.Commit, err error) {
@@ -179,7 +174,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 		{
-			gitRepositoryPath,
 			"HEAD~4",
 			"test~2^2^2",
 			func(cs *[]*object.Commit, err error) {
@@ -200,7 +194,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 		{
-			gitRepositoryPath,
 			getCommitFromRef("HEAD~4").ID().String(),
 			getCommitFromRef("test~2^2^2").ID().String(),
 			func(cs *[]*object.Commit, err error) {
@@ -221,7 +214,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 		{
-			gitRepositoryPath,
 			"whatever",
 			"HEAD~1",
 			func(cs *[]*object.Commit, err error) {
@@ -229,7 +221,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 		{
-			gitRepositoryPath,
 			"HEAD~1",
 			"whatever",
 			func(cs *[]*object.Commit, err error) {
@@ -237,7 +228,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 		{
-			gitRepositoryPath,
 			"HEAD",
 			"HEAD",
 			func(cs *[]*object.Commit, err error) {
@@ -245,7 +235,6 @@ func TestFetchCommitInterval(t *testing.T) {
 			},
 		},
 	}
-
 	for _, test := range tests {
 		test.f(FetchCommitInterval(repo, test.toRef, test.fromRef))
 	}
@@ -255,29 +244,24 @@ func TestShallowCloneProducesNoErrors(t *testing.T) {
 	repositoryPath := "shallow-repository-test"
 	cmd := exec.Command("rm", "-rf", repositoryPath)
 	_, err := cmd.Output()
-
 	assert.NoError(t, err)
 
 	cmd = exec.Command("git", "clone", "--depth", "2", "https://github.com/octocat/Spoon-Knife.git", repositoryPath)
 	_, err = cmd.Output()
-
 	assert.NoError(t, err)
 
 	path, err := os.Getwd()
-
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	repo, err := git.PlainOpen(path + "/" + repositoryPath)
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	commits, err := FetchCommitInterval(repo, "HEAD~1", "HEAD")
-
 	assert.NoError(t, err)
 	assert.Len(t, *commits, 1, "Must fetch commits in shallow clone")
 }
