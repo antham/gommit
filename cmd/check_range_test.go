@@ -15,13 +15,11 @@ import (
 
 func TestCheckRangeWithErrors(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -146,7 +144,6 @@ func TestCheckRangeWithErrors(t *testing.T) {
 
 func TestCheckRangeWithBadCommitMessage(t *testing.T) {
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -154,7 +151,6 @@ func TestCheckRangeWithBadCommitMessage(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/bad-commit.sh"} {
 
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -206,7 +202,6 @@ func TestCheckRangeWithBadCommitMessage(t *testing.T) {
 
 func TestCheckRangeWithNoErrors(t *testing.T) {
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -214,7 +209,6 @@ func TestCheckRangeWithNoErrors(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}

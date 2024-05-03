@@ -16,7 +16,6 @@ var checkCommitCmd = &cobra.Command{
 	Short: "Check commit message",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := validateFileConfig()
-
 		if err != nil {
 			failure(err)
 
@@ -24,7 +23,6 @@ var checkCommitCmd = &cobra.Command{
 		}
 
 		ID, path, err := extractCheckCommitArgs(args)
-
 		if err != nil {
 			failure(err)
 
@@ -72,7 +70,6 @@ func extractCheckCommitArgs(args []string) (string, string, error) {
 	}
 
 	path, err = parseDirectory(path)
-
 	if err != nil {
 		return "", "", err
 	}

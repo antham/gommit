@@ -15,13 +15,11 @@ import (
 
 func TestCheckCommitWithErrors(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -148,14 +146,12 @@ func TestCheckCommitWithErrors(t *testing.T) {
 
 func TestCheckCommit(t *testing.T) {
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	for _, filename := range []string{"../features/repo.sh"} {
 		err = exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -181,7 +177,6 @@ func TestCheckCommit(t *testing.T) {
 	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -210,14 +205,12 @@ func TestCheckCommit(t *testing.T) {
 
 func TestCheckCommitWithBadMessage(t *testing.T) {
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	for _, filename := range []string{"../features/repo.sh", "../features/bad-commit.sh"} {
 		err = exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -243,7 +236,6 @@ func TestCheckCommitWithBadMessage(t *testing.T) {
 	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}

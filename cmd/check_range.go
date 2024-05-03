@@ -15,7 +15,6 @@ var checkRangeCmd = &cobra.Command{
 	Short: "Check messages in range",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := validateFileConfig()
-
 		if err != nil {
 			failure(err)
 
@@ -23,7 +22,6 @@ var checkRangeCmd = &cobra.Command{
 		}
 
 		from, to, path, err := extractCheckRangeArgs(args)
-
 		if err != nil {
 			failure(err)
 
@@ -47,7 +45,6 @@ var checkRangeCmd = &cobra.Command{
 func extractCheckRangeArgs(args []string) (string, string, string, error) {
 	if len(args) < 2 {
 		return "", "", "", fmt.Errorf("Two arguments required : origin commit and end commit")
-
 	}
 
 	if len(args) > 3 {
@@ -62,7 +59,6 @@ func extractCheckRangeArgs(args []string) (string, string, string, error) {
 	}
 
 	path, err = parseDirectory(path)
-
 	if err != nil {
 		return "", "", "", err
 	}

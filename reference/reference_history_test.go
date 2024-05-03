@@ -14,25 +14,24 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
-var repo *git.Repository
-var gitRepositoryPath = "testing-repository"
+var (
+	repo              *git.Repository
+	gitRepositoryPath = "testing-repository"
+)
 
 func setup() {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	path, err := os.Getwd()
-
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	repo, err = git.PlainOpen(path + "/" + gitRepositoryPath)
-
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -51,7 +50,6 @@ func getCommitFromRef(ref string) *object.Commit {
 	}
 
 	c, err := repo.CommitObject(plumbing.NewHash(string(ID)))
-
 	if err != nil {
 		logrus.WithField("ID", ID).Fatal(err)
 	}
@@ -271,7 +269,6 @@ func TestFetchCommitByID(t *testing.T) {
 	cmd.Dir = gitRepositoryPath
 
 	ID, err := cmd.Output()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}

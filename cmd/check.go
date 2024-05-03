@@ -33,7 +33,6 @@ func parseDirectory(path string) (string, error) {
 		}
 	} else {
 		f, err := os.Stat(path)
-
 		if err != nil {
 			return "", fmt.Errorf(`Ensure "%s" directory exists`, path)
 		}
@@ -57,7 +56,6 @@ func validateFileConfig() error {
 
 	for name, matcher := range viper.GetStringMapString("matchers") {
 		_, err := regexp2.Compile(matcher, 0)
-
 		if err != nil {
 			return fmt.Errorf(`Regexp "%s" identified by "%s" is not a valid regexp, please check the syntax`, matcher, name)
 		}

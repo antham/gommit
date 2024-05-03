@@ -167,7 +167,6 @@ func MatchMessageQuery(query MessageQuery) (*Matching, error) {
 // MatchCommitQuery triggers regexp matching against a commit
 func MatchCommitQuery(query CommitQuery) (*Matching, error) {
 	commit, err := fetchCommit(query.Path, query.ID)
-
 	if err != nil {
 		return &Matching{}, err
 	}
@@ -178,7 +177,6 @@ func MatchCommitQuery(query CommitQuery) (*Matching, error) {
 // MatchRangeQuery triggers regexp matching against a range of commit messages
 func MatchRangeQuery(query RangeQuery) (*[]*Matching, error) {
 	commits, err := fetchCommits(query.Path, query.From, query.To)
-
 	if err != nil {
 		return &[]*Matching{}, err
 	}

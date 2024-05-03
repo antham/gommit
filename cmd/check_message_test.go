@@ -14,7 +14,6 @@ import (
 
 func TestCheckMessageWithErrors(t *testing.T) {
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -97,7 +96,6 @@ func TestCheckMessageWithErrors(t *testing.T) {
 
 func TestCheckMessage(t *testing.T) {
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -105,7 +103,6 @@ func TestCheckMessage(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -151,7 +148,6 @@ func TestCheckMessage(t *testing.T) {
 
 func TestCheckMessageWithBadMessage(t *testing.T) {
 	path, err := os.Getwd()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -159,7 +155,6 @@ func TestCheckMessageWithBadMessage(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
