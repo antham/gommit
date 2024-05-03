@@ -101,7 +101,6 @@ func TestMessageDoesntMatchTemplate(t *testing.T) {
 
 func TestMatchRangeQuery(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -126,7 +125,6 @@ func TestMatchRangeQuery(t *testing.T) {
 
 func TestMatchRangeQueryrWithAMessageErrorCommit(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -155,7 +153,6 @@ func TestMatchRangeQueryrWithAMessageErrorCommit(t *testing.T) {
 func TestMatchRangeQueryWithASummaryErrorCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh", "../features/bad-summary-message-commit.sh"} {
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -185,7 +182,6 @@ func TestMatchRangeQueryWithASummaryErrorCommit(t *testing.T) {
 func TestMatchRangeWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -217,7 +213,6 @@ func TestMatchRangeWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
 func TestMatchRangeQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -245,7 +240,6 @@ func TestMatchRangeQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 
 func TestMatchRangeWithAnUnexistingCommitRange(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -270,7 +264,6 @@ func TestMatchRangeWithAnUnexistingCommitRange(t *testing.T) {
 
 func TestMatchRangeWithNoCommitsInCommitRange(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -295,7 +288,6 @@ func TestMatchRangeWithNoCommitsInCommitRange(t *testing.T) {
 
 func TestMatchMessageQuery(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -317,7 +309,6 @@ func TestMatchMessageQuery(t *testing.T) {
 
 func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -342,7 +333,6 @@ func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 
 func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -367,7 +357,6 @@ func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 
 func TestMatchCommitQuery(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -376,7 +365,6 @@ func TestMatchCommitQuery(t *testing.T) {
 	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -400,7 +388,6 @@ func TestMatchCommitQuery(t *testing.T) {
 
 func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -409,7 +396,6 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -436,7 +422,6 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 
 func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -445,7 +430,6 @@ func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
 	cmd.Dir = "testing-repository"
 
 	ID, err := cmd.Output()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -468,7 +452,6 @@ func TestMatchCommitQueryWithWrongRepository(t *testing.T) {
 
 func TestMatchCommitQueryWithAnUnexistingCommit(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -503,13 +486,11 @@ func TestIsValidSummaryLengthWithInCorrectSize(t *testing.T) {
 
 func TestIsMergeCommitWithANonMergeCommit(t *testing.T) {
 	err := exec.Command("../features/repo.sh").Run()
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	commits, err := fetchCommits("testing-repository", "test~2", "test")
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -520,14 +501,12 @@ func TestIsMergeCommitWithANonMergeCommit(t *testing.T) {
 func TestIsMergeCommitWithAMergeCommit(t *testing.T) {
 	for _, filename := range []string{"../features/repo.sh"} {
 		err := exec.Command(filename).Run()
-
 		if err != nil {
 			logrus.Fatal(err)
 		}
 	}
 
 	commits, err := fetchCommits("testing-repository", "test~3", "test~2")
-
 	if err != nil {
 		logrus.Fatal(err)
 	}

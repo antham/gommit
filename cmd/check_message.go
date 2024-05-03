@@ -15,7 +15,6 @@ var checkMessageCmd = &cobra.Command{
 	Short: "Check message",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := validateFileConfig()
-
 		if err != nil {
 			failure(err)
 
@@ -23,7 +22,6 @@ var checkMessageCmd = &cobra.Command{
 		}
 
 		message, err := extractCheckMessageArgs(args)
-
 		if err != nil {
 			failure(err)
 
