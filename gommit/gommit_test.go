@@ -4,9 +4,9 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
 func TestFetchCommits(t *testing.T) {
