@@ -3,7 +3,7 @@ module github.com/antham/gommit
 require (
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/fatih/color v1.18.0
-	github.com/go-git/go-git/v5 v5.16.0
+	github.com/go-git/go-git/v5 v5.16.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
