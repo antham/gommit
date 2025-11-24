@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"errors"
 	"regexp"
 
 	"github.com/spf13/cobra"
@@ -50,17 +50,17 @@ var checkCommitCmd = &cobra.Command{
 
 func extractCheckCommitArgs(args []string) (string, string, error) {
 	if len(args) < 1 {
-		return "", "", fmt.Errorf("One argument required : commit id")
+		return "", "", errors.New("one argument required : commit id")
 	}
 
 	ok, err := regexp.Match("[a-fA-F0-9]{40}", []byte(args[0]))
 
 	if err != nil || !ok {
-		return "", "", fmt.Errorf("Argument must be a valid commit id")
+		return "", "", errors.New("argument must be a valid commit id")
 	}
 
 	if len(args) > 2 {
-		return "", "", fmt.Errorf("2 arguments must be provided at most")
+		return "", "", errors.New("2 arguments must be provided at most")
 	}
 
 	var path string

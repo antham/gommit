@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -34,7 +35,7 @@ func parseDirectory(path string) (string, error) {
 	} else {
 		f, err := os.Stat(path)
 		if err != nil {
-			return "", fmt.Errorf(`Ensure "%s" directory exists`, path)
+			return "", fmt.Errorf(`ensure "%s" directory exists`, path)
 		}
 
 		if !f.IsDir() {
@@ -47,17 +48,17 @@ func parseDirectory(path string) (string, error) {
 
 func validateFileConfig() error {
 	if len(viper.GetStringMapString("matchers")) == 0 {
-		return fmt.Errorf("At least one matcher must be defined")
+		return errors.New("at least one matcher must be defined")
 	}
 
 	if len(viper.GetStringMapString("examples")) == 0 {
-		return fmt.Errorf("At least one example must be defined")
+		return errors.New("at least one example must be defined")
 	}
 
 	for name, matcher := range viper.GetStringMapString("matchers") {
 		_, err := regexp2.Compile(matcher, 0)
 		if err != nil {
-			return fmt.Errorf(`Regexp "%s" identified by "%s" is not a valid regexp, please check the syntax`, matcher, name)
+			return fmt.Errorf(`regexp "%s" identified by "%s" is not a valid regexp, please check the syntax`, matcher, name)
 		}
 	}
 

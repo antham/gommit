@@ -77,7 +77,7 @@ var renderExamples = func(examples map[string]string) {
 		color.White("----")
 		fmt.Println()
 
-		color.Yellow("%s : ", strings.Replace(cases.Title(language.English).String(key), "_", " ", -1))
+		color.Yellow("%s : ", strings.ReplaceAll(cases.Title(language.English).String(key), "_", " "))
 		fmt.Println()
 
 		color.Cyan("%s", example)

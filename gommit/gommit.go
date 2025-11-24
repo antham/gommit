@@ -1,6 +1,7 @@
 package gommit
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -112,12 +113,12 @@ func analyzeMessage(message string, matchers map[string]string, options Options)
 
 	if options.CheckSummaryLength && !isValidSummaryLength(options.SummaryLength, message) {
 		hasError = true
-		matching.SummaryError = fmt.Errorf("Commit summary length is greater than %d characters", options.SummaryLength)
+		matching.SummaryError = fmt.Errorf("commit summary length is greater than %d characters", options.SummaryLength)
 	}
 
 	if !matchTemplate {
 		hasError = true
-		matching.MessageError = fmt.Errorf("No template match commit message")
+		matching.MessageError = errors.New("no template match commit message")
 	}
 
 	if hasError {

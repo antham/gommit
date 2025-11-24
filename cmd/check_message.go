@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -48,7 +49,7 @@ var checkMessageCmd = &cobra.Command{
 
 func extractCheckMessageArgs(args []string) (string, error) {
 	if len(args) != 1 {
-		return "", fmt.Errorf("One argument required : message")
+		return "", errors.New("one argument required : message")
 	}
 
 	return args[0], nil

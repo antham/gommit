@@ -1,6 +1,7 @@
 package reference
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
@@ -38,7 +39,7 @@ func (e errReferenceNotFound) Error() string {
 }
 
 // errBrowsingTree is triggered when something wrong occurred during commit analysis process
-var errBrowsingTree = fmt.Errorf("An issue occurred during tree analysis")
+var errBrowsingTree = errors.New("an issue occurred during tree analysis")
 
 // FetchCommitInterval retrieves commit refSolver in a given interval for a repository
 func FetchCommitInterval(repo *git.Repository, from string, to string) (*[]*object.Commit, error) {

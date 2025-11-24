@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -44,7 +45,7 @@ var checkRangeCmd = &cobra.Command{
 
 func extractCheckRangeArgs(args []string) (string, string, string, error) {
 	if len(args) < 2 {
-		return "", "", "", fmt.Errorf("Two arguments required : origin commit and end commit")
+		return "", "", "", errors.New("two arguments required : origin commit and end commit")
 	}
 
 	if len(args) > 3 {
