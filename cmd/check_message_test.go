@@ -55,9 +55,9 @@ func TestCheckMessageWithErrors(t *testing.T) {
 
 	errorStrings := []string{
 		"open .*: no such file or directory",
-		"One argument required : message",
-		`At least one matcher must be defined`,
-		`At least one example must be defined`,
+		"one argument required : message",
+		`at least one matcher must be defined`,
+		`at least one example must be defined`,
 	}
 
 	configs := []string{

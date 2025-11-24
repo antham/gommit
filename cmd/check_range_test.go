@@ -94,14 +94,14 @@ func TestCheckRangeWithErrors(t *testing.T) {
 	}
 
 	errors := []error{
-		fmt.Errorf("Two arguments required : origin commit and end commit"),
-		fmt.Errorf("Two arguments required : origin commit and end commit"),
+		fmt.Errorf("two arguments required : origin commit and end commit"),
+		fmt.Errorf("two arguments required : origin commit and end commit"),
 		fmt.Errorf("3 arguments must be provided at most"),
-		fmt.Errorf(`Ensure "whatever" directory exists`),
+		fmt.Errorf(`ensure "whatever" directory exists`),
 		fmt.Errorf(`"check.go" must be a directory`),
 		fmt.Errorf(`Reference "whatever" can't be found in git repository`),
-		fmt.Errorf(`At least one matcher must be defined`),
-		fmt.Errorf(`At least one example must be defined`),
+		fmt.Errorf(`at least one matcher must be defined`),
+		fmt.Errorf(`at least one example must be defined`),
 	}
 
 	configs := []string{

@@ -18,7 +18,7 @@ func TestBuildOptionsWithDefaultValues(t *testing.T) {
 func TestParseDirectoryWithErrors(t *testing.T) {
 	_, err := parseDirectory("/test")
 
-	assert.EqualError(t, err, `Ensure "/test" directory exists`)
+	assert.EqualError(t, err, `ensure "/test" directory exists`)
 
 	_, err = os.Create("/tmp/file")
 

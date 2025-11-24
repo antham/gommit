@@ -94,15 +94,15 @@ func TestCheckCommitWithErrors(t *testing.T) {
 	}
 
 	errors := []error{
-		fmt.Errorf("One argument required : commit id"),
-		fmt.Errorf(`Argument must be a valid commit id`),
-		fmt.Errorf(`Argument must be a valid commit id`),
+		fmt.Errorf("one argument required : commit id"),
+		fmt.Errorf(`argument must be a valid commit id`),
+		fmt.Errorf(`argument must be a valid commit id`),
 		fmt.Errorf(`2 arguments must be provided at most`),
-		fmt.Errorf(`Ensure "whatever" directory exists`),
+		fmt.Errorf(`ensure "whatever" directory exists`),
 		fmt.Errorf(`object not found`),
-		fmt.Errorf(`At least one matcher must be defined`),
-		fmt.Errorf(`At least one example must be defined`),
-		fmt.Errorf(`Regexp "**" identified by "all" is not a valid regexp, please check the syntax`),
+		fmt.Errorf(`at least one matcher must be defined`),
+		fmt.Errorf(`at least one example must be defined`),
+		fmt.Errorf(`regexp "**" identified by "all" is not a valid regexp, please check the syntax`),
 	}
 
 	configs := []string{

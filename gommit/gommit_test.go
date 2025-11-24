@@ -146,7 +146,7 @@ func TestMatchRangeQueryrWithAMessageErrorCommit(t *testing.T) {
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 2, "Must return two items")
 	assert.Equal(t, "feat(file8) : new file 8\n\ncreate a new file 8\n", (*m)[0].Context["message"], "Must contains commit message")
-	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
+	assert.EqualError(t, (*m)[0].MessageError, "no template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
@@ -176,7 +176,7 @@ func TestMatchRangeQueryWithASummaryErrorCommit(t *testing.T) {
 	assert.Len(t, *m, 1, "Must return one item")
 	assert.Equal(t, "A very long summary commit greater than minimum length 50\n", (*m)[0].Context["message"], "Must contains commit message")
 	assert.NoError(t, (*m)[0].MessageError, "Must not contains error")
-	assert.EqualError(t, (*m)[0].SummaryError, "Commit summary length is greater than 50 characters", "Must contains summary message error")
+	assert.EqualError(t, (*m)[0].SummaryError, "commit summary length is greater than 50 characters", "Must contains summary message error")
 }
 
 func TestMatchRangeWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
@@ -203,10 +203,10 @@ func TestMatchRangeWithAMessageErrorCommitWithoutMergeCommit(t *testing.T) {
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 7)
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		assert.NotContains(t, (*m)[i].Context["message"], "Merge")
 	}
-	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
+	assert.EqualError(t, (*m)[0].MessageError, "no template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
@@ -234,7 +234,7 @@ func TestMatchRangeQueryWithAMessageErrorCommitWithMergeCommits(t *testing.T) {
 
 	assert.NoError(t, err, "Must return no errors")
 	assert.Len(t, *m, 9, "Must return two itesm")
-	assert.EqualError(t, (*m)[0].MessageError, "No template match commit message", "Must contains commit message error")
+	assert.EqualError(t, (*m)[0].MessageError, "no template match commit message", "Must contains commit message error")
 	assert.NoError(t, (*m)[0].SummaryError, "Must not contains error")
 }
 
@@ -326,7 +326,7 @@ func TestMatchMessageQueryWithAMessageThatDoesntMatchTemplate(t *testing.T) {
 	m, err := MatchMessageQuery(q)
 
 	assert.NoError(t, err, "Must return no error")
-	assert.EqualError(t, m.MessageError, "No template match commit message", "Must return a template message error")
+	assert.EqualError(t, m.MessageError, "no template match commit message", "Must return a template message error")
 	assert.NoError(t, m.SummaryError, "Must return no summary error")
 	assert.Equal(t, "update(file) :", m.Context["message"], "Must contains original message")
 }
@@ -351,7 +351,7 @@ func TestMatchMessageQueryWithAMessageThatDoesntFitSummaryLength(t *testing.T) {
 
 	assert.NoError(t, err, "Must return no error")
 	assert.NoError(t, m.MessageError, "Must return no template message error")
-	assert.EqualError(t, m.SummaryError, "Commit summary length is greater than 50 characters", "Must return a template message error")
+	assert.EqualError(t, m.SummaryError, "commit summary length is greater than 50 characters", "Must return a template message error")
 	assert.Equal(t, "update(file) : test test test test test test test test test test test test test test", m.Context["message"], "Must contains original message")
 }
 
@@ -416,7 +416,7 @@ func TestMatchCommitQueryWithCommitMessageThatDoesntMatchTemplate(t *testing.T) 
 	assert.NoError(t, err, "Must return no error")
 	assert.Equal(t, "feat(file8) : new file 8\n\ncreate a new file 8\n", m.Context["message"], "Must contains commit message")
 	assert.Equal(t, string(ID[:len(ID)-1]), m.Context["ID"], "Must contains commit id")
-	assert.EqualError(t, m.MessageError, "No template match commit message", "Must contains commit message error")
+	assert.EqualError(t, m.MessageError, "no template match commit message", "Must contains commit message error")
 	assert.NoError(t, m.SummaryError, "Must not contains error")
 }
 
