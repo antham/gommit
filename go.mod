@@ -1,7 +1,7 @@
 module github.com/antham/gommit
 
 require (
-	github.com/dlclark/regexp2 v1.11.5
+	github.com/dlclark/regexp2 v1.12.0
 	github.com/fatih/color v1.19.0
 	github.com/go-git/go-git/v5 v5.18.0
 	github.com/sirupsen/logrus v1.9.4
