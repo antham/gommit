@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/dlclark/regexp2"
 	"github.com/go-git/go-git/v5"
@@ -84,7 +85,7 @@ func messageMatchTemplate(message string, template string) bool {
 func isValidSummaryLength(summaryLength int, message string) bool {
 	chunks := strings.Split(message, "\n")
 
-	return len(chunks) == 0 || len(chunks[0]) <= summaryLength
+	return len(chunks) == 0 || utf8.RuneCountInString(chunks[0]) <= summaryLength
 }
 
 // isMergeCommit returns true if a commit is a merge commit
